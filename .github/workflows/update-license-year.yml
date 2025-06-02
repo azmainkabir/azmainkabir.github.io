@@ -3,6 +3,7 @@ name: Update License Year
 on:
   schedule:
     - cron: '0 0 1 1 *'  # At midnight on Jan 1 every year
+  workflow_dispatch:
 
 jobs:
   update-year:
