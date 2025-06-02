@@ -15,7 +15,7 @@ jobs:
       - name: Update LICENSE year
         run: |
           current_year=$(date +"%Y")
-          sed -i "s/Copyright (c) [0-9]\{4\}/Copyright (c) $current_year/" LICENSE.md
+          sed -i "s/Copyright © [0-9]\{4\}/Copyright © $current_year/" LICENSE.md
 
       - name: Commit changes
         run: |
