@@ -701,6 +701,18 @@
               </div>
             </form>
 
+            <script>
+              document.querySelector("form").addEventListener("submit", function (e) {
+                const name = document.querySelector("input[name='name']").value.trim();
+                const subject = document.querySelector("input[name='subject']").value.trim();
+                const message = document.querySelector("textarea[name='message']").value.trim();
+
+                if (name === "" || subject === "" || message === "") {
+                  alert("Please fill in all fields with valid content.");
+                  e.preventDefault();
+                }
+              });
+            </script>
 
           </div>
 
