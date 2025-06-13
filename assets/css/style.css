@@ -947,6 +947,10 @@ section {
 
 .contact .form-style textarea {
   padding: 10px 12px;
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+  resize: vertical;
 }
 
 .contact .form-style .send-button {
@@ -1007,21 +1011,21 @@ section {
   height: 36px;
   transition: background 0.3s, box-shadow 0.3s;
   vertical-align: middle;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
 #footer .social-links a:hover {
   background: linear-gradient(145deg, #0678e3, #0563bb);
   color: #fff;
   text-decoration: none;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4);
 }
 
 #footer .copyright {
   margin: 0 0 5px 0;
 }
-
-
 
 /*-----------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------
@@ -1243,8 +1247,8 @@ body.dark-mode .skills .progress .skill {
 # Resume - Dark Mode
 --------------------------------------------------------------*/
 body.dark-mode .resume .resume-item::before {
-    background: #1e1e1e;
-    border: 2px solid #80d8ff;
+  background: #1e1e1e;
+  border: 2px solid #80d8ff;
 }
 
 body.dark-mode .resume .resume-title {
@@ -1272,15 +1276,16 @@ body.dark-mode .resume .resume-item .title {
 # Portfolio - Dark Mode
 --------------------------------------------------------------*/
 body.dark-mode .portfolio #portfolio-flters {
-    background: #1e1e1e;
+  background: #1e1e1e;
 }
 
-body.dark-mode .portfolio #portfolio-flters li:hover, body.dark-mode .portfolio #portfolio-flters li.filter-active {
-    color: #80d8ff;
+body.dark-mode .portfolio #portfolio-flters li:hover,
+body.dark-mode .portfolio #portfolio-flters li.filter-active {
+  color: #80d8ff;
 }
 
 body.dark-mode .portfolio #portfolio-flters li {
-    color: #989898;
+  color: #989898;
 }
 
 body.dark-mode .portfolio .portfolio-wrap {
@@ -1328,7 +1333,7 @@ body.dark-mode .contact .info {
 }
 
 body.dark-mode .contact .info h4 {
-    color: #e0e0e0;
+  color: #e0e0e0;
 }
 
 body.dark-mode .contact .info i {
@@ -1381,7 +1386,6 @@ body.dark-mode #footer .social-links a:hover {
   color: #ffffff;
 }
 
-
 /* Menu Button - Dark Mode */
 body.dark-mode .mobile-nav-toggle {
   background-color: #333333; /* Matches dark mode toggle button */
@@ -1396,7 +1400,6 @@ body.dark-mode .mobile-nav-toggle:hover {
   background-color: #444444; /* Slightly lighter background */
   color: #ffffff; /* White icon on hover */
 }
-
 
 /* Dark Mode Toggle Button */
 
@@ -1470,8 +1473,6 @@ body.dark-mode .dark-mode-button .icon-sun {
   opacity: 1;
   transform: rotate(0deg); /* Spins to appear */
 }
-
-
 
 /* Adjustments for smaller devices */
 @media screen and (max-width: 992px) {
