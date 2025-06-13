@@ -706,6 +706,7 @@
                 const charCount = document.getElementById("charCount");
                 const maxLength = 1000;
                 let warningTimeout = null;
+                let lastWarningTime = null;
 
                 function updateCount() {
                   const length = textarea.value.length;
@@ -720,18 +721,26 @@
                   }
                 }
 
+                function resetToSafeUI() {
+                  updateCount();
+                  lastWarningTime = null;
+                  warningTimeout = null;
+                }
+
                 function showWarning(message) {
                   charCount.textContent = message;
                   charCount.style.color = "red";
                   textarea.style.borderColor = "red";
 
+                  lastWarningTime = Date.now();
+
                   if (warningTimeout) clearTimeout(warningTimeout);
                   warningTimeout = setTimeout(() => {
-                    updateCount(); // Reset to count and styles
+                    resetToSafeUI();
                   }, 4000); // 4 seconds
                 }
 
-                // Typing beyond limit
+                // Detect overflow attempt via typing
                 textarea.addEventListener("keydown", (e) => {
                   const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
                   if (textarea.value.length >= maxLength && !allowedKeys.includes(e.key)) {
@@ -740,20 +749,39 @@
                   }
                 });
 
-                // Normal typing/deleting
-                textarea.addEventListener("input", updateCount);
+                // Input
+                textarea.addEventListener("input", () => {
+                  const length = textarea.value.length;
 
-                // Paste overflow
+                  // If within 4 seconds of last warning and user types valid input
+                  if (lastWarningTime && length <= maxLength && (Date.now() - lastWarningTime < 4000)) {
+                    if (warningTimeout) clearTimeout(warningTimeout);
+                    resetToSafeUI();
+                  } else {
+                    updateCount(); // normal update
+                  }
+                });
+
+                // If within 4 seconds of last warning and user click anywhere
+                document.addEventListener("click", () => {
+                  if (lastWarningTime && (Date.now() - lastWarningTime < 4000)) {
+                    if (warningTimeout) clearTimeout(warningTimeout);
+                    resetToSafeUI();
+                  }
+                });
+
+                // Paste handling
                 textarea.addEventListener("paste", (e) => {
                   const pasteText = e.clipboardData.getData('text');
                   const currentLength = textarea.value.length;
+
                   if (currentLength + pasteText.length > maxLength) {
                     e.preventDefault();
                     showWarning(`Limit exceeded! Max ${maxLength} characters allowed.`);
                   }
                 });
 
-                // Initial display
+                // Initial load
                 updateCount();
               </script>
             </form>
