@@ -278,10 +278,11 @@ h6 {
 --------------------------------------------------------------*/
 #hero {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background: url("../image/bg-image.jpg") top right no-repeat;
   background-size: cover;
   position: relative;
+  overflow: hidden;
 }
 
 @media (min-width: 993px) {
@@ -292,12 +293,59 @@ h6 {
 
 #hero:before {
   content: "";
-  background: rgba(255, 255, 255, 0.8);
+  background: linear-gradient(90deg, rgba(247, 251, 255, 0.95) 0%, rgba(247, 251, 255, 0.78) 46%, rgba(247, 251, 255, 0.38) 100%);
   position: absolute;
   bottom: 0;
   top: 0;
   left: 0;
   right: 0;
+  z-index: 0;
+}
+
+#hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(0, 166, 166, 0.22) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 58%, rgba(5, 99, 187, 0.2) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 28%, rgba(255, 179, 0, 0.16) 0 2px, transparent 3px),
+    linear-gradient(118deg, transparent 0 18%, rgba(5, 99, 187, 0.08) 18.2%, transparent 18.6% 100%),
+    linear-gradient(28deg, transparent 0 56%, rgba(0, 166, 166, 0.08) 56.2%, transparent 56.6% 100%),
+    radial-gradient(circle at 20% 25%, rgba(0, 166, 166, 0.14), transparent 28%),
+    radial-gradient(circle at 76% 18%, rgba(255, 179, 0, 0.1), transparent 24%);
+  background-size: 100% 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#hero .hero-signal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00a6a6;
+  box-shadow: 0 0 10px rgba(0, 166, 166, 0.8), 0 0 24px rgba(0, 166, 166, 0.28);
+  opacity: 0;
+  pointer-events: none;
+}
+
+#hero .signal-one {
+  animation: signalPathOne 6.4s ease-in-out infinite;
+}
+
+#hero .signal-two {
+  background: #0563bb;
+  box-shadow: 0 0 10px rgba(5, 99, 187, 0.72), 0 0 24px rgba(5, 99, 187, 0.24);
+  animation: signalPathTwo 7.6s ease-in-out infinite 1.2s;
+}
+
+#hero .container {
+  position: relative;
+  z-index: 3;
 }
 
 #hero h1 {
@@ -306,6 +354,7 @@ h6 {
   font-weight: 700;
   line-height: 56px;
   color: #45505b;
+  max-width: 680px;
 }
 
 #hero p {
@@ -317,11 +366,137 @@ h6 {
 
 #hero p span {
   color: #0563bb;
-  letter-spacing: 1px;
+  letter-spacing: 0;
+}
+
+#hero .hero-summary {
+  max-width: 620px;
+  color: #5f6f7f;
+  font-size: 18px;
+  line-height: 1.7;
+  margin-top: 16px;
+}
+
+#hero .hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+#hero .hero-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+#hero .hero-button::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), transparent 58%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#hero .hero-button i,
+#hero .hero-button span {
+  position: relative;
+  z-index: 1;
+}
+
+#hero .hero-button i {
+  font-size: 16px;
+}
+
+#hero .hero-button.primary {
+  background: linear-gradient(135deg, #0563bb, #00a6a6);
+  color: #ffffff;
+  box-shadow: 0 16px 34px rgba(5, 99, 187, 0.25);
+}
+
+#hero .hero-button.secondary {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(5, 99, 187, 0.18);
+  color: #0563bb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 12px 26px rgba(69, 80, 91, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+#hero .hero-button:hover,
+#hero .hero-button:focus {
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+#hero .hero-button:hover::before,
+#hero .hero-button:focus::before {
+  opacity: 1;
+}
+
+#hero .hero-button.primary:hover,
+#hero .hero-button.primary:focus {
+  color: #ffffff;
+  box-shadow: 0 18px 34px rgba(5, 99, 187, 0.3);
+}
+
+#hero .hero-button.secondary:hover,
+#hero .hero-button.secondary:focus {
+  background: #ffffff;
+  border-color: rgba(5, 99, 187, 0.32);
+  color: #0563bb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86), 0 16px 32px rgba(69, 80, 91, 0.14);
+}
+
+#hero .tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 620px;
+  margin-top: 26px;
+}
+
+#hero .tech-chip {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(5, 99, 187, 0.12);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(239, 248, 255, 0.52));
+  color: #45505b;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 10px 24px rgba(69, 80, 91, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+#hero .tech-chip::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #00a6a6;
+  box-shadow: 0 0 12px rgba(0, 166, 166, 0.65);
 }
 
 #hero .social-links {
-  margin-top: 30px;
+  margin-top: 28px;
 }
 
 #hero .social-links a {
@@ -338,9 +513,162 @@ h6 {
   color: #0563bb;
 }
 
+#hero .hero-tech-panel {
+  position: absolute;
+  right: 24px;
+  bottom: -32px;
+  width: min(410px, 38vw);
+  padding: 18px;
+  border: 1px solid rgba(5, 99, 187, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 22px 55px rgba(69, 80, 91, 0.18);
+  backdrop-filter: blur(14px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+#hero .hero-tech-panel:hover {
+  border-color: rgba(5, 99, 187, 0.26);
+  transform: translateY(-3px);
+  box-shadow: 0 26px 62px rgba(69, 80, 91, 0.22);
+}
+
+#hero .tech-panel-bar {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 14px;
+}
+
+#hero .tech-panel-bar span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #0563bb;
+}
+
+#hero .tech-panel-bar span:nth-child(2) {
+  background: #00a6a6;
+}
+
+#hero .tech-panel-bar span:nth-child(3) {
+  background: #ffb300;
+}
+
+#hero .hero-tech-panel code {
+  display: grid;
+  gap: 8px;
+  color: #45505b;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+#hero .hero-tech-panel code span {
+  display: block;
+  overflow: hidden;
+  width: max-content;
+  max-width: 100%;
+  clip-path: inset(0 100% 0 0);
+  animation: codeTypeLoop 6.8s steps(42, end) infinite;
+}
+
+#hero .hero-tech-panel code span:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+#hero .hero-tech-panel code span:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+#hero .hero-tech-panel code span::before {
+  content: ">";
+  color: #00a6a6;
+  margin-right: 8px;
+}
+
+@keyframes signalPathOne {
+  0% {
+    opacity: 0;
+    transform: translate(13vw, 70vh) scale(0.6);
+  }
+  12%,
+  72% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translate(84vw, 23vh) scale(1);
+  }
+}
+
+@keyframes signalPathTwo {
+  0% {
+    opacity: 0;
+    transform: translate(12vw, 28vh) scale(0.6);
+  }
+  12%,
+  72% {
+    opacity: 0.9;
+  }
+  86%,
+  100% {
+    opacity: 0;
+    transform: translate(86vw, 70vh) scale(1);
+  }
+}
+
+@keyframes codeTypeLoop {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.5;
+  }
+  18%,
+  76% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  92%,
+  100% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #hero .hero-signal,
+  #hero .hero-tech-panel code span {
+    animation: none;
+  }
+
+  #hero .hero-tech-panel code span {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (max-width: 1199px) {
+  #hero .hero-tech-panel {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    max-width: 620px;
+    margin-top: 24px;
+  }
+}
+
 @media (max-width: 992px) {
   #hero {
     text-align: center;
+  }
+  #hero .container {
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  #hero .hero-actions,
+  #hero .tech-stack {
+    justify-content: center;
   }
   #hero h1 {
     font-size: 32px;
@@ -350,6 +678,20 @@ h6 {
     margin-top: 10px;
     font-size: 20px;
     line-height: 24px;
+  }
+  #hero .hero-summary {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #hero .hero-tech-panel {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+  #hero .hero-tech-panel code {
+    font-size: 11px;
   }
 }
 
@@ -1253,12 +1595,23 @@ body.dark-mode .nav-menu .active i {
 --------------------------------------------------------------*/
 
 body.dark-mode #hero::before {
-  background: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(90deg, rgba(18, 18, 18, 0.92) 0%, rgba(18, 18, 18, 0.82) 48%, rgba(18, 18, 18, 0.58) 100%);
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+}
+
+body.dark-mode #hero::after {
+  background-image:
+    radial-gradient(circle at 18% 24%, rgba(0, 220, 209, 0.2) 0 2px, transparent 3px),
+    radial-gradient(circle at 34% 58%, rgba(128, 216, 255, 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 70% 28%, rgba(255, 204, 77, 0.12) 0 2px, transparent 3px),
+    linear-gradient(118deg, transparent 0 18%, rgba(128, 216, 255, 0.07) 18.2%, transparent 18.6% 100%),
+    linear-gradient(28deg, transparent 0 56%, rgba(0, 220, 209, 0.07) 56.2%, transparent 56.6% 100%),
+    radial-gradient(circle at 20% 25%, rgba(0, 220, 209, 0.1), transparent 28%),
+    radial-gradient(circle at 76% 18%, rgba(255, 204, 77, 0.06), transparent 24%);
 }
 
 body.dark-mode #hero h1,
@@ -1277,12 +1630,74 @@ body.dark-mode #hero p span {
   color: #80d8ff;
 }
 
+body.dark-mode #hero .hero-summary {
+  color: #d1d1d1;
+}
+
+body.dark-mode #hero .hero-button.primary {
+  background: linear-gradient(135deg, #80d8ff, #00dcd1);
+  color: #111111;
+  box-shadow: 0 14px 28px rgba(0, 220, 209, 0.18);
+}
+
+body.dark-mode #hero .hero-button.secondary {
+  background: rgba(42, 42, 42, 0.76);
+  border-color: rgba(128, 216, 255, 0.22);
+  color: #80d8ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 26px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode #hero .hero-button.primary:hover,
+body.dark-mode #hero .hero-button.primary:focus {
+  color: #111111;
+  box-shadow: 0 18px 34px rgba(64, 196, 255, 0.22);
+}
+
+body.dark-mode #hero .hero-button.secondary:hover,
+body.dark-mode #hero .hero-button.secondary:focus {
+  background: #2a2a2a;
+  border-color: rgba(128, 216, 255, 0.36);
+  color: #80d8ff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 16px 32px rgba(0, 0, 0, 0.28);
+}
+
+body.dark-mode #hero .tech-chip {
+  background: linear-gradient(135deg, rgba(42, 42, 42, 0.84), rgba(34, 48, 56, 0.58));
+  border-color: rgba(128, 216, 255, 0.18);
+  color: #d1d1d1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode #hero .tech-chip::before {
+  background: #00dcd1;
+  box-shadow: 0 0 12px rgba(0, 220, 209, 0.65);
+}
+
 body.dark-mode #hero .social-links a {
   color: #bbbbbb;
 }
 
 body.dark-mode #hero .social-links a:hover {
   color: #80d8ff;
+}
+
+body.dark-mode #hero .hero-tech-panel {
+  background: rgba(30, 30, 30, 0.72);
+  border-color: rgba(128, 216, 255, 0.16);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode #hero .hero-tech-panel:hover {
+  border-color: rgba(128, 216, 255, 0.28);
+  box-shadow: 0 26px 62px rgba(0, 0, 0, 0.42);
+}
+
+body.dark-mode #hero .hero-tech-panel code {
+  color: #d1d1d1;
+}
+
+body.dark-mode #hero .hero-tech-panel code span::before {
+  color: #00dcd1;
 }
 
 /*--------------------------------------------------------------
