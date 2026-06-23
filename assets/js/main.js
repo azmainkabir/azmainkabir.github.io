@@ -170,6 +170,9 @@
     const resumeAction = select('#resume-action');
     const resumeActionText = resumeAction ? resumeAction.querySelector('.resume-action-text') : null;
     const resumeSection = select('#resume');
+    const resumeList = resumeContent.querySelector('.resume-list');
+    let resumeBalanceColumns = [];
+    let resumeSectionGroups = [];
     let resumeProgress = 0;
     let isDraggingResume = false;
     let didDragResume = false;
@@ -194,6 +197,85 @@
     }
 
     const canShowSideZipper = () => true;
+
+    const buildResumeSectionGroups = () => {
+      if (!resumeList || resumeSectionGroups.length) return;
+
+      let currentGroup = null;
+
+      Array.from(resumeList.childNodes).forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE && node.classList.contains('resume-title')) {
+          currentGroup = document.createElement('div');
+          currentGroup.className = 'resume-section-group';
+          resumeList.insertBefore(currentGroup, node);
+          currentGroup.appendChild(node);
+          resumeSectionGroups.push(currentGroup);
+          return;
+        }
+
+        if (currentGroup) {
+          currentGroup.appendChild(node);
+        }
+      });
+
+      const finalGroup = resumeSectionGroups[resumeSectionGroups.length - 1];
+      if (finalGroup) {
+        finalGroup.classList.add('is-final-section');
+      }
+    }
+
+    const restoreResumeListOrder = () => {
+      if (!resumeList) return;
+
+      resumeList.classList.remove('is-balanced');
+      resumeSectionGroups.forEach((group) => resumeList.appendChild(group));
+      resumeBalanceColumns.forEach((column) => column.remove());
+      resumeBalanceColumns = [];
+    }
+
+    const resumeGroupHeight = (group) => {
+      const style = getComputedStyle(group);
+      return group.getBoundingClientRect().height + parseFloat(style.marginTop || 0) + parseFloat(style.marginBottom || 0);
+    }
+
+    const balanceResumeSections = () => {
+      if (!resumeList || !resumeSectionGroups.length) return;
+
+      restoreResumeListOrder();
+
+      if (window.innerWidth < 992) return;
+
+      const leftColumn = document.createElement('div');
+      const rightColumn = document.createElement('div');
+      leftColumn.className = 'resume-balance-column';
+      rightColumn.className = 'resume-balance-column';
+      resumeBalanceColumns = [leftColumn, rightColumn];
+
+      resumeList.replaceChildren(leftColumn, rightColumn);
+      resumeList.classList.add('is-balanced');
+      resumeSectionGroups.forEach((group) => leftColumn.appendChild(group));
+
+      const groupHeights = resumeSectionGroups.map((group) => resumeGroupHeight(group));
+      const totalHeight = groupHeights.reduce((sum, height) => sum + height, 0);
+      let bestSplitIndex = 1;
+      let bestDifference = Number.POSITIVE_INFINITY;
+      let leftHeight = 0;
+
+      for (let index = 1; index < resumeSectionGroups.length; index += 1) {
+        leftHeight += groupHeights[index - 1];
+        const rightHeight = totalHeight - leftHeight;
+        const difference = Math.abs(leftHeight - rightHeight);
+
+        if (difference < bestDifference) {
+          bestDifference = difference;
+          bestSplitIndex = index;
+        }
+      }
+
+      resumeSectionGroups.forEach((group, index) => {
+        (index < bestSplitIndex ? leftColumn : rightColumn).appendChild(group);
+      });
+    }
 
     const clampPageScroll = (scrollTop) => {
       const maxPageScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
@@ -445,16 +527,23 @@
     });
 
     window.addEventListener('resize', () => {
+      balanceResumeSections();
       applyResumeProgress(resumeProgress);
       updateResumeZipperVisibility();
     });
 
     if (resumeSection) {
-      window.addEventListener('load', updateResumeZipperVisibility);
+      window.addEventListener('load', () => {
+        balanceResumeSections();
+        applyResumeProgress(resumeProgress);
+        updateResumeZipperVisibility();
+      });
       window.addEventListener('scroll', updateResumeZipperVisibility);
       updateResumeZipperVisibility();
     }
 
+    buildResumeSectionGroups();
+    balanceResumeSections();
     applyResumeProgress(0);
   }
 
