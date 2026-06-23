@@ -205,7 +205,9 @@
       }
 
       if (resumeToggleText) {
-        resumeToggleText.textContent = isDraggingResume ? `${Math.round(resumeProgress * 100)}%` : 'Reveal';
+        resumeToggleText.textContent = isDraggingResume
+          ? `${Math.round(resumeProgress * 100)}%`
+          : resumeProgress >= 0.999 ? 'Open' : 'Reveal';
       }
 
       if (resumeActionText) {
@@ -244,16 +246,32 @@
       resumeToggle.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
     }
 
+    const updateResumeZipperClip = (sectionRect) => {
+      if (!resumeZipperWrap) return false;
+
+      const zipperRect = resumeZipperWrap.getBoundingClientRect();
+      const clipTop = Math.max(sectionRect.top - zipperRect.top, 0);
+      const clipBottom = Math.max(zipperRect.bottom - sectionRect.bottom, 0);
+      const isIntersectingResume = sectionRect.bottom > zipperRect.top && sectionRect.top < zipperRect.bottom;
+
+      resumeZipperWrap.style.setProperty('--zipper-clip-top', `${clipTop}px`);
+      resumeZipperWrap.style.setProperty('--zipper-clip-bottom', `${clipBottom}px`);
+
+      return isIntersectingResume;
+    }
+
     const updateResumeZipperVisibility = () => {
       if (!resumeSection) return;
+
+      const sectionRect = resumeSection.getBoundingClientRect();
+      const isIntersectingZipper = updateResumeZipperClip(sectionRect);
 
       if (isDraggingResume) {
         setResumeZipperVisibility(true);
         return;
       }
 
-      const sectionRect = resumeSection.getBoundingClientRect();
-      setResumeZipperVisibility(sectionRect.bottom > window.innerHeight * 0.16 && sectionRect.top < window.innerHeight * 0.84);
+      setResumeZipperVisibility(isIntersectingZipper);
     }
 
     resumeToggle.addEventListener('pointerdown', (event) => {
@@ -288,7 +306,7 @@
       resumeToggle.classList.remove('is-dragging');
       resumeContent.classList.remove('resume-dragging');
       if (resumeToggleText) {
-        resumeToggleText.textContent = 'Reveal';
+        resumeToggleText.textContent = resumeProgress >= 0.999 ? 'Open' : 'Reveal';
       }
       updateResumeZipperVisibility();
       refreshResumeAos();

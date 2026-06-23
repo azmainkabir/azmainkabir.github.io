@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark-mode">
 
 <head>
   <meta charset="utf-8">
@@ -32,7 +32,7 @@
 
 </head>
 
-<body>
+<body class="dark-mode">
 
   <!-- ======= Mobile nav toggle button ======= -->
   <i class="bi bi-list mobile-nav-toggle d-xl-none"></i>
@@ -64,6 +64,7 @@
   <section id="hero" class="d-flex flex-column justify-content-center">
     <span class="hero-signal signal-one" aria-hidden="true"></span>
     <span class="hero-signal signal-two" aria-hidden="true"></span>
+    <span class="hero-aurora" aria-hidden="true"></span>
     <div class="container" data-aos="zoom-in" data-aos-delay="100">
       <h1>Azmain Kabir</h1>
       <p>
@@ -939,16 +940,19 @@
   <!-- Dark Mode Toggle Script -->
   <script>
     const toggleButton = document.getElementById("dark-mode-toggle");
+    const root = document.documentElement;
     const body = document.body;
 
     function syncThemeToggle() {
       const isDarkMode = body.classList.contains("dark-mode");
+      root.classList.toggle("dark-mode", isDarkMode);
       toggleButton.setAttribute("aria-pressed", isDarkMode ? "true" : "false");
       toggleButton.setAttribute("aria-label", isDarkMode ? "Switch to light mode" : "Switch to dark mode");
     }
     
-    // Load user's preference from local storage
-    if (localStorage.getItem("dark-mode") === "enabled") {
+    // Load user's preference from local storage, defaulting to dark mode.
+    const savedThemePreference = localStorage.getItem("dark-mode");
+    if (savedThemePreference === null || savedThemePreference === "enabled") {
       body.classList.add("dark-mode");
     } else {
       body.classList.remove("dark-mode");

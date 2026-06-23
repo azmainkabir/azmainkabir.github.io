@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark-mode">
 
 <head>
   <meta charset="utf-8">
@@ -30,7 +30,13 @@
 
 </head>
 
-<body>
+<body class="dark-mode">
+  <script>
+    if (localStorage.getItem("dark-mode") === "disabled") {
+      document.documentElement.classList.remove("dark-mode");
+      document.body.classList.remove("dark-mode");
+    }
+  </script>
 
   <main id="main">
 
