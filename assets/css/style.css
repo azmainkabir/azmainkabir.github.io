@@ -1466,42 +1466,52 @@ main > section:nth-of-type(even)::after {
 
 .resume .resume-action-button {
   position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 52px;
-  padding: 12px 20px;
-  border: 0;
+  width: auto;
+  max-width: calc(100vw - 48px);
+  min-height: 50px;
+  padding: 0 12px 0 24px;
+  border: 1px solid rgba(5, 99, 187, 0.2);
   border-radius: 999px;
-  color: #ffffff;
-  background:
-    linear-gradient(135deg, rgba(0, 136, 129, 0.95), rgba(5, 99, 187, 0.98)),
-    #0563bb;
-  box-shadow: 0 16px 36px rgba(5, 99, 187, 0.2), 0 6px 14px rgba(0, 136, 129, 0.14);
-  overflow: hidden;
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  color: #0563bb;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(239, 248, 255, 0.72));
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 16px 34px rgba(69, 80, 91, 0.12), 0 0 0 6px rgba(5, 99, 187, 0.04);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 .resume .resume-action-button::before {
   content: "";
   position: absolute;
-  inset: -40% auto -40% -55%;
-  width: 48%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
-  transform: skewX(-18deg);
-  transition: left 0.7s ease;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.78) 42%, transparent 72%);
+  opacity: 0;
+  transform: translateX(-55%);
+  transition: opacity 0.25s ease, transform 0.55s ease;
 }
 
 .resume .resume-action-button:hover,
 .resume .resume-action-button:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 42px rgba(5, 99, 187, 0.26), 0 8px 18px rgba(0, 136, 129, 0.18);
+  background: linear-gradient(135deg, #ffffff, #eef8ff);
+  border-color: rgba(5, 99, 187, 0.34);
+  color: #0563bb;
+  outline: 0;
+  transform: translateY(-3px);
+  box-shadow: 0 22px 42px rgba(69, 80, 91, 0.16), 0 0 0 8px rgba(5, 99, 187, 0.06);
 }
 
 .resume .resume-action-button:hover::before,
 .resume .resume-action-button:focus::before {
-  left: 108%;
+  opacity: 1;
+  transform: translateX(55%);
 }
 
 .resume .resume-action-button:focus {
@@ -1524,13 +1534,14 @@ main > section:nth-of-type(even)::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  color: #0563bb;
-  background: rgba(255, 255, 255, 0.95);
+  color: #ffffff;
+  background: linear-gradient(135deg, #0563bb, #00a6a6);
   font-size: 15px;
-  transition: transform 0.35s ease;
+  box-shadow: 0 10px 20px rgba(5, 99, 187, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .resume .resume-action-button[aria-expanded="true"] i {
@@ -1586,7 +1597,7 @@ main > section:nth-of-type(even)::after {
   }
 
   .resume .resume-action-button {
-    width: 100%;
+    max-width: calc(100vw - 92px);
   }
 }
 
@@ -2734,9 +2745,18 @@ body.dark-mode .resume .resume-action-button {
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34), 0 0 0 1px rgba(128, 216, 255, 0.08);
 }
 
+body.dark-mode .resume .resume-action-button::before {
+  background: linear-gradient(120deg, transparent 0%, rgba(128, 216, 255, 0.18) 42%, transparent 72%);
+}
+
 body.dark-mode .resume .resume-action-button:hover,
 body.dark-mode .resume .resume-action-button:focus {
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.34), 0 10px 22px rgba(128, 216, 255, 0.22);
+  background:
+    linear-gradient(145deg, rgba(28, 40, 52, 0.94), rgba(13, 18, 24, 0.98)),
+    #111923;
+  border-color: rgba(128, 216, 255, 0.36);
+  color: #e6f7ff;
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.34), 0 10px 22px rgba(128, 216, 255, 0.16);
 }
 
 body.dark-mode .resume .resume-zipper-button:hover,
