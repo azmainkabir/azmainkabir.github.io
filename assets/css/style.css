@@ -953,7 +953,8 @@ h6 {
     padding-right: 28px;
   }
   #hero .hero-actions,
-  #hero .tech-stack {
+  #hero .tech-stack,
+  #hero .social-links {
     justify-content: center;
   }
   #hero h1 {
