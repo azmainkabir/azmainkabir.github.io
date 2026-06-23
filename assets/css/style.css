@@ -668,37 +668,39 @@ h6 {
 #hero .tech-stack {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   max-width: 620px;
-  margin-top: 26px;
+  margin-top: 22px;
 }
 
 #hero .tech-chip {
   position: relative;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
-  padding: 0 14px;
-  border: 1px solid rgba(5, 99, 187, 0.12);
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(5, 99, 187, 0.16);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(239, 248, 255, 0.52));
-  color: #45505b;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(239, 248, 255, 0.28)),
+    rgba(255, 255, 255, 0.24);
+  color: #234356;
   font-family: "Poppins", sans-serif;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 10px 24px rgba(69, 80, 91, 0.08);
-  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
+  backdrop-filter: blur(8px);
 }
 
 #hero .tech-chip::before {
   content: "";
-  width: 6px;
-  height: 6px;
-  margin-right: 8px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #00a6a6;
-  box-shadow: 0 0 12px rgba(0, 166, 166, 0.65);
+  box-shadow: 0 0 10px rgba(0, 166, 166, 0.65);
 }
 
 #hero .social-links {
@@ -2699,10 +2701,12 @@ body.dark-mode #hero .hero-button.secondary:focus {
 }
 
 body.dark-mode #hero .tech-chip {
-  background: linear-gradient(135deg, rgba(42, 42, 42, 0.84), rgba(34, 48, 56, 0.58));
-  border-color: rgba(128, 216, 255, 0.18);
-  color: #d1d1d1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 10px 24px rgba(0, 0, 0, 0.22);
+  background:
+    linear-gradient(180deg, rgba(22, 34, 45, 0.82), rgba(8, 14, 22, 0.5)),
+    rgba(10, 18, 27, 0.34);
+  border-color: rgba(128, 216, 255, 0.2);
+  color: #b9d8e3;
+  box-shadow: inset 0 0 0 1px rgba(128, 216, 255, 0.06);
 }
 
 body.dark-mode #hero .tech-chip::before {
