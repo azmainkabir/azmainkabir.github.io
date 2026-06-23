@@ -927,7 +927,9 @@ section {
 
 .contact .form-style {
   width: 100%;
-  background: #fff;
+  position: relative;
+  background: transparent;
+  padding: 4px 0 0;
 }
 
 .contact .form-style .form-group {
@@ -938,36 +940,107 @@ section {
   display: none;
 }
 
+.contact .form-style .field-shell {
+  position: relative;
+  border-radius: 8px;
+}
+
+.contact .form-style .field-shell i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  color: #0563bb;
+  font-size: 18px;
+  transform: translateY(-50%);
+  transition: color 0.25s ease, transform 0.25s ease;
+  z-index: 2;
+}
+
+.contact .form-style .message-shell i {
+  top: 18px;
+  transform: none;
+}
+
 .contact .form-style input,
 .contact .form-style textarea {
-  border-radius: 4px;
-  box-shadow: none;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(5, 99, 187, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(69, 80, 91, 0.07);
+  color: #45505b;
   font-size: 14px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.contact .form-style input:focus,
+.contact .form-style textarea:focus {
+  background: #ffffff;
+  border-color: rgba(5, 99, 187, 0.58);
+  box-shadow: 0 14px 34px rgba(5, 99, 187, 0.16), 0 0 0 4px rgba(5, 99, 187, 0.08);
+  outline: 0;
+  transform: translateY(-1px);
+}
+
+.contact .form-style .field-shell:focus-within i {
+  color: #00a6a6;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.contact .form-style .message-shell:focus-within i {
+  transform: scale(1.08);
 }
 
 .contact .form-style input {
   height: 44px;
+  padding-left: 44px;
 }
 
 .contact .form-style textarea {
-  padding: 10px 12px;
-  min-height: 100px;
+  padding: 12px 12px 12px 44px;
+  min-height: 130px;
   max-height: 300px;
   overflow-y: auto;
   resize: vertical;
 }
 
-.contact .form-style .send-button {
-  background: #0563bb;
-  border: 0;
-  padding: 10px 35px;
-  color: #fff;
-  transition: 0.4s;
-  border-radius: 50px;
+.contact .form-style .char-count-wrap {
+  text-align: right;
+  margin-top: 6px;
 }
 
-.contact .form-style .send-button:hover {
-  background: #0678e3;
+.contact .form-style .send-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #0563bb, #00a6a6);
+  border: 0;
+  min-width: 174px;
+  padding: 12px 28px;
+  color: #fff;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  border-radius: 999px;
+  box-shadow: 0 14px 28px rgba(5, 99, 187, 0.24);
+}
+
+.contact .form-style .send-button i {
+  font-size: 16px;
+  transition: transform 0.25s ease;
+}
+
+.contact .form-style .send-button:hover,
+.contact .form-style .send-button:focus {
+  background: linear-gradient(135deg, #0678e3, #008f8f);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 34px rgba(5, 99, 187, 0.3);
+  outline: 0;
+}
+
+.contact .form-style .send-button:hover i,
+.contact .form-style .send-button:focus i {
+  transform: translateX(3px);
 }
 
 /*--------------------------------------------------------------
@@ -1357,22 +1430,45 @@ body.dark-mode .contact .info i {
 }
 
 body.dark-mode .contact .form-style {
-  background: #1e1e1e;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 body.dark-mode .contact .form-style input,
 body.dark-mode .contact .form-style textarea {
-  background: #333333;
+  background: rgba(42, 42, 42, 0.84);
+  border-color: rgba(128, 216, 255, 0.2);
   color: #e0e0e0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+body.dark-mode .contact .form-style input:focus,
+body.dark-mode .contact .form-style textarea:focus {
+  background: #2a2a2a;
+  border-color: rgba(128, 216, 255, 0.52);
+  box-shadow: 0 12px 30px rgba(64, 196, 255, 0.14), 0 0 0 4px rgba(128, 216, 255, 0.08);
+}
+
+body.dark-mode .contact .form-style .field-shell i {
+  color: #80d8ff;
+}
+
+body.dark-mode .contact .form-style .field-shell:focus-within i {
+  color: #00dcd1;
 }
 
 body.dark-mode .contact .form-style .send-button {
-  background: #80d8ff;
-  color: #1e1e1e;
+  background: linear-gradient(135deg, #80d8ff, #00dcd1);
+  color: #111111;
+  box-shadow: 0 14px 28px rgba(0, 220, 209, 0.18);
 }
 
-body.dark-mode .contact .form-style .send-button:hover {
-  background: #40c4ff;
+body.dark-mode .contact .form-style .send-button:hover,
+body.dark-mode .contact .form-style .send-button:focus {
+  background: linear-gradient(135deg, #40c4ff, #00b8ad);
+  color: #111111;
+  box-shadow: 0 18px 34px rgba(64, 196, 255, 0.22);
 }
 
 /*--------------------------------------------------------------
@@ -1425,77 +1521,124 @@ body.dark-mode .mobile-nav-toggle:hover {
   color: #ffffff; /* White icon on hover */
 }
 
-/* Dark Mode Toggle Button */
-
 .dark-mode-button {
   position: fixed;
   top: 15px;
   right: 15px;
-  background: #333333; /* Default to light mode color */
-  color: #80d8ff; /* Default icon color */
-  border: none;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(5, 99, 187, 0.18);
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
   z-index: 1000;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  overflow: hidden; /* Ensures consistent clipping of content */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(69, 80, 91, 0.16);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark Mode Button Color Changes */
-body.dark-mode .dark-mode-button {
-  background: #ffffff; /* White background for dark mode */
-  color: #ffcc00; /* Sun icon color for dark mode */
+.dark-mode-button .theme-icon-morph {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
 }
 
-/* Hover effect for Dark Mode and Light Mode */
-.dark-mode-button:hover {
-  background: #444444;
-  color: #ffffff;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-mode .dark-mode-button:hover {
-  background: #dbdbdb; /* Light background for dark mode on hover */
-  color: #ff9f00; /* Yellow sun icon color on hover */
-}
-
-/* Icon Styling */
-.dark-mode-button i {
-  font-size: 20px; /* Ensures consistent icon size */
-  width: 20px; /* Fixed width for consistency */
-  height: 20px; /* Fixed height for consistency */
-  line-height: 20px; /* Centers the icon text */
+.dark-mode-button .theme-icon-morph::before {
+  content: "";
   position: absolute;
-  transition: opacity 0.3s ease, transform 0.6s ease; /* For spin effect */
-  text-align: center; /* Ensures alignment within button */
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(5, 99, 187, 0.08);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.45);
+  transition: opacity 0.3s ease, transform 0.45s ease, background 0.3s ease;
 }
 
-/* Initial Moon Icon (Light Mode) */
+.dark-mode-button i {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  line-height: 1;
+  transition: opacity 0.35s ease, transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.3s ease;
+}
+
 .dark-mode-button .icon-moon {
+  color: #0563bb;
   opacity: 1;
-  transform: rotate(0deg); /* Initial position */
+  transform: scale(1) rotate(0deg);
 }
 
 .dark-mode-button .icon-sun {
+  color: #ffb300;
   opacity: 0;
-  transform: rotate(-180deg); /* Initial position for reverse spin */
+  transform: scale(0.15) rotate(-120deg);
 }
 
-/* Toggle effect for icons */
+.dark-mode-button:hover,
+.dark-mode-button:focus {
+  border-color: rgba(5, 99, 187, 0.32);
+  box-shadow: 0 16px 32px rgba(5, 99, 187, 0.2);
+  transform: translateY(-1px);
+}
+
+.dark-mode-button:focus {
+  outline: 3px solid rgba(5, 99, 187, 0.2);
+  outline-offset: 4px;
+}
+
+.dark-mode-button:hover .theme-icon-morph::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.dark-mode-button.toggle-animation .theme-icon-morph {
+  animation: iconMorphPulse 0.32s ease;
+}
+
+body.dark-mode .dark-mode-button {
+  background: rgba(24, 24, 24, 0.94);
+  border-color: rgba(128, 216, 255, 0.22);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+
+body.dark-mode .dark-mode-button .theme-icon-morph::before {
+  background: rgba(255, 204, 77, 0.14);
+}
+
 body.dark-mode .dark-mode-button .icon-moon {
+  color: #80d8ff;
   opacity: 0;
-  transform: rotate(180deg); /* Spins to hide */
+  transform: scale(0.15) rotate(120deg);
 }
 
 body.dark-mode .dark-mode-button .icon-sun {
+  color: #ffcc4d;
   opacity: 1;
-  transform: rotate(0deg); /* Spins to appear */
+  transform: scale(1) rotate(0deg);
+}
+
+body.dark-mode .dark-mode-button:focus {
+  outline-color: rgba(128, 216, 255, 0.28);
+}
+
+@keyframes iconMorphPulse {
+  50% {
+    transform: scale(0.86) rotate(18deg);
+  }
 }
 
 /* Adjustments for smaller devices */
@@ -1503,9 +1646,6 @@ body.dark-mode .dark-mode-button .icon-sun {
   .dark-mode-button {
     top: 15px;
     right: 60px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px; /* Ensures icon does not grow */
   }
 }
 
@@ -1513,8 +1653,5 @@ body.dark-mode .dark-mode-button .icon-sun {
   .dark-mode-button {
     top: 15px;
     right: 60px;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
   }
 }

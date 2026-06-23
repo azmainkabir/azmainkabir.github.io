@@ -39,9 +39,11 @@
   <!-- ======= Header ======= -->
   <header id="header" class="d-flex flex-column justify-content-center">
       
-    <button id="dark-mode-toggle" class="dark-mode-button">
-      <i class="bx bx-moon icon-moon"></i>
-      <i class="bx bx-sun icon-sun"></i>
+    <button id="dark-mode-toggle" class="dark-mode-button" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <span class="theme-icon-morph" aria-hidden="true">
+        <i class="bx bx-moon icon-moon"></i>
+        <i class="bx bx-sun icon-sun"></i>
+      </span>
     </button>
 
     <nav id="navbar" class="navbar nav-menu">
@@ -697,23 +699,38 @@
 
               <div class="row">
                 <div class="col-md-6 form-group">
-                  <input type="text" name="Name" class="form-control" id="name" placeholder="Your Name" required>
+                  <div class="field-shell">
+                    <i class="bi bi-person"></i>
+                    <input type="text" name="Name" class="form-control" id="name" placeholder="Your Name" required>
+                  </div>
                 </div>
                 <div class="col-md-6 form-group mt-3 mt-md-0">
-                  <input type="email" class="form-control" name="Email" id="email" placeholder="Your Email" required>
+                  <div class="field-shell">
+                    <i class="bi bi-envelope"></i>
+                    <input type="email" class="form-control" name="Email" id="email" placeholder="Your Email" required>
+                  </div>
                 </div>
               </div>
               <div class="form-group mt-3">
-                <input type="text" class="form-control" name="_subject" id="subject" placeholder="Subject" required>
+                <div class="field-shell">
+                  <i class="bi bi-chat-square-text"></i>
+                  <input type="text" class="form-control" name="_subject" id="subject" placeholder="Subject" required>
+                </div>
               </div>
               <div class="form-group mt-3">
-                <textarea class="form-control" name="Message" id="message" rows="5" placeholder="Message" maxlength="1000" required></textarea>
-                <div style="text-align: right;">
+                <div class="field-shell message-shell">
+                  <i class="bi bi-pencil-square"></i>
+                  <textarea class="form-control" name="Message" id="message" rows="5" placeholder="Message" maxlength="1000" required></textarea>
+                </div>
+                <div class="char-count-wrap">
                   <small id="charCount" class="form-text text-muted"></small>
                 </div>
               </div>
               <div class="text-center">
-                <button type="submit" class="send-button">Send Message</button>
+                <button type="submit" class="send-button">
+                  <span>Send Message</span>
+                  <i class="bi bi-send"></i>
+                </button>
               </div>
               <script>
                 const textarea = document.getElementById("message");
@@ -870,6 +887,12 @@
   <script>
     const toggleButton = document.getElementById("dark-mode-toggle");
     const body = document.body;
+
+    function syncThemeToggle() {
+      const isDarkMode = body.classList.contains("dark-mode");
+      toggleButton.setAttribute("aria-pressed", isDarkMode ? "true" : "false");
+      toggleButton.setAttribute("aria-label", isDarkMode ? "Switch to light mode" : "Switch to dark mode");
+    }
     
     // Load user's preference from local storage
     if (localStorage.getItem("dark-mode") === "enabled") {
@@ -877,6 +900,7 @@
     } else {
       body.classList.remove("dark-mode");
     }
+    syncThemeToggle();
     
     toggleButton.addEventListener("click", () => {
       body.classList.toggle("dark-mode");
@@ -887,6 +911,7 @@
       } else {
         localStorage.setItem("dark-mode", "disabled");
       }
+      syncThemeToggle();
     
       // Add a small effect for icon change
       toggleButton.classList.add("toggle-animation");
