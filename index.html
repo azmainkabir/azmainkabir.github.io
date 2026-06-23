@@ -147,6 +147,7 @@
           <h2>Resume</h2>
         </div>
 
+        <div id="resume-content" class="resume-content resume-collapsed">
         <div class="row">
           <div class="col-lg-6">
               
@@ -420,7 +421,25 @@
 
           </div>
         </div>
+        </div>
 
+        <div class="resume-action-wrap">
+          <button id="resume-action" class="resume-action-button" type="button" aria-expanded="false" aria-controls="resume-content">
+            <span class="resume-action-text">See full resume</span>
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </button>
+        </div>
+
+      </div>
+      <div class="resume-zipper-wrap">
+        <div id="resume-toggle" class="resume-zipper-button" role="slider" tabindex="-1" aria-hidden="true" aria-label="Drag zipper to reveal resume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Resume preview" aria-expanded="false" aria-controls="resume-content">
+          <span class="zipper-track" aria-hidden="true">
+            <span class="zipper-teeth"></span>
+            <span class="zipper-pull"></span>
+          </span>
+          <span class="resume-toggle-text">Reveal</span>
+          <i class="bi bi-grip-vertical" aria-hidden="true"></i>
+        </div>
       </div>
     </section><!-- End Resume Section -->
 

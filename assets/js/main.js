@@ -130,6 +130,227 @@
   }
 
   /**
+   * Resume zipper reveal
+   */
+  const resumeContent = select('#resume-content');
+  const resumeToggle = select('#resume-toggle');
+  if (resumeContent && resumeToggle) {
+    const resumeToggleText = resumeToggle.querySelector('.resume-toggle-text');
+    const zipperTrack = resumeToggle.querySelector('.zipper-track');
+    const resumeZipperWrap = select('.resume-zipper-wrap');
+    const resumeAction = select('#resume-action');
+    const resumeActionText = resumeAction ? resumeAction.querySelector('.resume-action-text') : null;
+    const resumeSection = select('#resume');
+    let resumeProgress = 0;
+    let isDraggingResume = false;
+    let didDragResume = false;
+    let resumeStartY = 0;
+
+    const clampResumeProgress = (value) => Math.min(Math.max(value, 0), 1);
+
+    const resumeCollapsedHeight = () => {
+      const collapsedHeight = getComputedStyle(resumeContent).getPropertyValue('--resume-collapsed-height');
+      return parseFloat(collapsedHeight) || 780;
+    }
+
+    const resumeExpandedHeight = () => resumeContent.scrollHeight;
+
+    const refreshResumeAos = () => {
+      if (typeof AOS !== 'undefined') {
+        requestAnimationFrame(() => AOS.refresh());
+      }
+    }
+
+    const canShowSideZipper = () => true;
+
+    const scrollResumeWithProgress = (expandedHeight) => {
+      if (!resumeSection || !isDraggingResume || !didDragResume) return;
+
+      const resumeTop = resumeSection.offsetTop;
+      const maxResumeScroll = Math.max(expandedHeight - (window.innerHeight * 0.72), 0);
+      const maxPageScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+      const targetScroll = Math.min(resumeTop + (maxResumeScroll * resumeProgress), maxPageScroll);
+
+      window.scrollTo({
+        top: Math.max(resumeTop, targetScroll),
+        behavior: 'auto'
+      });
+    }
+
+    const applyResumeProgress = (progress, shouldRefresh = false, shouldScrollWithDrag = false) => {
+      resumeProgress = clampResumeProgress(progress);
+
+      const collapsedHeight = resumeCollapsedHeight();
+      const expandedHeight = resumeExpandedHeight();
+      const currentHeight = collapsedHeight + ((expandedHeight - collapsedHeight) * resumeProgress);
+      const trackTravel = zipperTrack ? Math.max(zipperTrack.clientHeight - 33, 0) : 0;
+      const trackFill = zipperTrack ? Math.max(zipperTrack.clientHeight - 16, 0) : 0;
+
+      resumeContent.style.setProperty('--resume-expanded-height', `${expandedHeight}px`);
+      resumeContent.style.setProperty('--resume-current-height', `${currentHeight}px`);
+      resumeContent.style.setProperty('--resume-fade-opacity', resumeProgress >= 0.999 ? '0' : '1');
+      resumeToggle.style.setProperty('--zipper-progress', resumeProgress);
+      resumeToggle.style.setProperty('--zipper-progress-fill', `${trackFill * resumeProgress}px`);
+      resumeToggle.style.setProperty('--zipper-pull-offset', `${trackTravel * resumeProgress}px`);
+      resumeToggle.style.setProperty('--zipper-pull-rotation', `${resumeProgress * 180}deg`);
+
+      resumeContent.classList.toggle('resume-collapsed', resumeProgress <= 0.001);
+      resumeContent.classList.toggle('resume-expanded', resumeProgress >= 0.999);
+      resumeToggle.setAttribute('aria-expanded', resumeProgress > 0.001 ? 'true' : 'false');
+      resumeToggle.setAttribute('aria-valuenow', Math.round(resumeProgress * 100));
+      resumeToggle.setAttribute('aria-valuetext', resumeProgress >= 0.999 ? 'Full resume visible' : `${Math.round(resumeProgress * 100)} percent of resume visible`);
+
+      if (resumeAction) {
+        resumeAction.setAttribute('aria-expanded', resumeProgress >= 0.999 ? 'true' : 'false');
+      }
+
+      if (resumeToggleText) {
+        resumeToggleText.textContent = isDraggingResume ? `${Math.round(resumeProgress * 100)}%` : 'Reveal';
+      }
+
+      if (resumeActionText) {
+        resumeActionText.textContent = resumeProgress >= 0.999 ? 'Show resume preview' : 'See full resume';
+      }
+
+      if (shouldRefresh) {
+        refreshResumeAos();
+      }
+
+      if (shouldScrollWithDrag) {
+        scrollResumeWithProgress(expandedHeight);
+      }
+    }
+
+    const progressFromPointer = (event) => {
+      if (!zipperTrack) return resumeProgress;
+
+      const trackRect = zipperTrack.getBoundingClientRect();
+      return clampResumeProgress((event.clientY - trackRect.top) / trackRect.height);
+    }
+
+    const collapseResumeWithScroll = () => {
+      applyResumeProgress(0, true);
+
+      if (resumeSection && window.scrollY > resumeSection.offsetTop) {
+        scrollto('#resume');
+      }
+    }
+
+    const setResumeZipperVisibility = (isVisible) => {
+      if (!resumeZipperWrap) return;
+      const shouldShow = isVisible && canShowSideZipper();
+      resumeZipperWrap.classList.toggle('is-visible', shouldShow);
+      resumeToggle.tabIndex = shouldShow ? 0 : -1;
+      resumeToggle.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+    }
+
+    const updateResumeZipperVisibility = () => {
+      if (!resumeSection) return;
+
+      if (isDraggingResume) {
+        setResumeZipperVisibility(true);
+        return;
+      }
+
+      const sectionRect = resumeSection.getBoundingClientRect();
+      setResumeZipperVisibility(sectionRect.bottom > window.innerHeight * 0.16 && sectionRect.top < window.innerHeight * 0.84);
+    }
+
+    resumeToggle.addEventListener('pointerdown', (event) => {
+      if (!zipperTrack) return;
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      isDraggingResume = true;
+      didDragResume = false;
+      resumeStartY = event.clientY;
+      resumeToggle.setPointerCapture(event.pointerId);
+      resumeToggle.classList.add('is-dragging');
+      resumeContent.classList.add('resume-dragging');
+      setResumeZipperVisibility(true);
+    });
+
+    resumeToggle.addEventListener('pointermove', (event) => {
+      if (!isDraggingResume) return;
+
+      if (Math.abs(event.clientY - resumeStartY) > 4) {
+        didDragResume = true;
+      }
+
+      if (didDragResume) {
+        applyResumeProgress(progressFromPointer(event), false, true);
+      }
+    });
+
+    const finishResumeDrag = (event) => {
+      if (!isDraggingResume) return;
+
+      isDraggingResume = false;
+      resumeToggle.classList.remove('is-dragging');
+      resumeContent.classList.remove('resume-dragging');
+      if (resumeToggleText) {
+        resumeToggleText.textContent = 'Reveal';
+      }
+      updateResumeZipperVisibility();
+      refreshResumeAos();
+
+      if (resumeToggle.hasPointerCapture(event.pointerId)) {
+        resumeToggle.releasePointerCapture(event.pointerId);
+      }
+
+    }
+
+    resumeToggle.addEventListener('pointerup', finishResumeDrag);
+    resumeToggle.addEventListener('pointercancel', finishResumeDrag);
+
+    if (resumeAction) {
+      resumeAction.addEventListener('click', () => {
+        if (resumeProgress >= 0.999) {
+          collapseResumeWithScroll();
+        } else {
+          applyResumeProgress(1, true);
+        }
+      });
+    }
+
+    resumeToggle.addEventListener('keydown', (event) => {
+      const step = 0.1;
+
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        applyResumeProgress(resumeProgress + step, true);
+      }
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        applyResumeProgress(resumeProgress - step, true);
+      }
+
+      if (event.key === 'Home') {
+        event.preventDefault();
+        collapseResumeWithScroll();
+      }
+
+      if (event.key === 'End') {
+        event.preventDefault();
+        applyResumeProgress(1, true);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      applyResumeProgress(resumeProgress);
+      updateResumeZipperVisibility();
+    });
+
+    if (resumeSection) {
+      window.addEventListener('load', updateResumeZipperVisibility);
+      window.addEventListener('scroll', updateResumeZipperVisibility);
+      updateResumeZipperVisibility();
+    }
+
+    applyResumeProgress(0);
+  }
+
+  /**
    * Hero type effect
    */
   const typed = select('.typed')
