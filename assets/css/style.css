@@ -998,33 +998,44 @@ section {
 }
 
 #footer .social-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
   margin: 0 0 40px 0;
 }
 
 #footer .social-links a {
-  font-size: 20px;
-  display: inline-block;
-  background: linear-gradient(145deg, #b0b0b0, #cccccc);
-  color: #45505b;
+  font-size: 21px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #0563bb;
   line-height: 1;
-  padding: 8px 0;
-  margin-right: 10px;
-  border-radius: 50%; /* Perfect circle for a cleaner look */
+  padding: 0;
+  border: 1px solid rgba(5, 99, 187, 0.18);
+  border-radius: 50%;
   text-align: center;
-  width: 36px;
-  height: 36px;
-  transition: background 0.3s, box-shadow 0.3s;
+  width: 42px;
+  height: 42px;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease, transform 0.25s ease;
   vertical-align: middle;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 22px rgba(69, 80, 91, 0.12);
 }
 
-#footer .social-links a:hover {
+#footer .social-links a:hover,
+#footer .social-links a:focus {
   background: linear-gradient(145deg, #0678e3, #0563bb);
+  border-color: transparent;
   color: #fff;
   text-decoration: none;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(5, 99, 187, 0.25);
+}
+
+#footer .social-links a:focus {
+  outline: 3px solid rgba(5, 99, 187, 0.22);
+  outline-offset: 3px;
 }
 
 #footer .copyright {
@@ -1381,13 +1392,22 @@ body.dark-mode #footer p {
 }
 
 body.dark-mode #footer .social-links a {
-  background: linear-gradient(145deg, #555555, #666666);
-  color: #ffffff;
+  background: #2a2a2a;
+  border-color: rgba(128, 216, 255, 0.35);
+  color: #80d8ff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
 }
 
-body.dark-mode #footer .social-links a:hover {
+body.dark-mode #footer .social-links a:hover,
+body.dark-mode #footer .social-links a:focus {
   background: linear-gradient(145deg, #0678e3, #0563bb);
+  border-color: transparent;
   color: #ffffff;
+  box-shadow: 0 12px 24px rgba(64, 196, 255, 0.22);
+}
+
+body.dark-mode #footer .social-links a:focus {
+  outline-color: rgba(128, 216, 255, 0.3);
 }
 
 /* Menu Button - Dark Mode */
