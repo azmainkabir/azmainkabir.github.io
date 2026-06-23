@@ -145,6 +145,9 @@
     let isDraggingResume = false;
     let didDragResume = false;
     let resumeStartY = 0;
+    let resumeScrollFrame = null;
+    let previousRootOverflowAnchor = '';
+    let previousBodyOverflowAnchor = '';
 
     const clampResumeProgress = (value) => Math.min(Math.max(value, 0), 1);
 
@@ -163,18 +166,57 @@
 
     const canShowSideZipper = () => true;
 
+    const clampPageScroll = (scrollTop) => {
+      const maxPageScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+      return Math.min(Math.max(scrollTop, 0), maxPageScroll);
+    }
+
+    const setResumeDragScroll = (scrollTop) => {
+      const targetScroll = clampPageScroll(scrollTop);
+
+      window.scrollTo({
+        top: targetScroll,
+        behavior: 'auto'
+      });
+      updateResumeZipperVisibility();
+
+      if (resumeScrollFrame) {
+        cancelAnimationFrame(resumeScrollFrame);
+      }
+
+      resumeScrollFrame = requestAnimationFrame(() => {
+        if (isDraggingResume) {
+          window.scrollTo({
+            top: clampPageScroll(targetScroll),
+            behavior: 'auto'
+          });
+          updateResumeZipperVisibility();
+        }
+
+        resumeScrollFrame = null;
+      });
+    }
+
+    const disableResumeScrollAnchoring = () => {
+      previousRootOverflowAnchor = document.documentElement.style.overflowAnchor;
+      previousBodyOverflowAnchor = document.body.style.overflowAnchor;
+      document.documentElement.style.overflowAnchor = 'none';
+      document.body.style.overflowAnchor = 'none';
+    }
+
+    const restoreResumeScrollAnchoring = () => {
+      document.documentElement.style.overflowAnchor = previousRootOverflowAnchor;
+      document.body.style.overflowAnchor = previousBodyOverflowAnchor;
+    }
+
     const scrollResumeWithProgress = (expandedHeight) => {
       if (!resumeSection || !isDraggingResume || !didDragResume) return;
 
       const resumeTop = resumeSection.offsetTop;
       const maxResumeScroll = Math.max(expandedHeight - (window.innerHeight * 0.72), 0);
-      const maxPageScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-      const targetScroll = Math.min(resumeTop + (maxResumeScroll * resumeProgress), maxPageScroll);
+      const targetScroll = resumeTop + (maxResumeScroll * resumeProgress);
 
-      window.scrollTo({
-        top: Math.max(resumeTop, targetScroll),
-        behavior: 'auto'
-      });
+      setResumeDragScroll(Math.max(resumeTop, targetScroll));
     }
 
     const applyResumeProgress = (progress, shouldRefresh = false, shouldScrollWithDrag = false) => {
@@ -189,6 +231,8 @@
       resumeContent.style.setProperty('--resume-expanded-height', `${expandedHeight}px`);
       resumeContent.style.setProperty('--resume-current-height', `${currentHeight}px`);
       resumeContent.style.setProperty('--resume-fade-opacity', resumeProgress >= 0.999 ? '0' : '1');
+      resumeContent.style.setProperty('--resume-drag-layout-height', `${expandedHeight}px`);
+      resumeContent.style.setProperty('--resume-drag-clip-bottom', `${Math.max(expandedHeight - currentHeight, 0)}px`);
       resumeToggle.style.setProperty('--zipper-progress', resumeProgress);
       resumeToggle.style.setProperty('--zipper-progress-fill', `${trackFill * resumeProgress}px`);
       resumeToggle.style.setProperty('--zipper-pull-offset', `${trackTravel * resumeProgress}px`);
@@ -281,18 +325,25 @@
       if (!zipperTrack) return;
       if (event.pointerType === 'mouse' && event.button !== 0) return;
 
+      event.preventDefault();
       isDraggingResume = true;
       didDragResume = false;
       resumeStartY = event.clientY;
       resumeToggle.setPointerCapture(event.pointerId);
       resumeToggle.classList.add('is-dragging');
       resumeContent.classList.add('resume-dragging');
+      document.body.classList.add('resume-zipper-dragging');
+      if (window.getSelection) {
+        window.getSelection().removeAllRanges();
+      }
+      disableResumeScrollAnchoring();
       setResumeZipperVisibility(true);
     });
 
     resumeToggle.addEventListener('pointermove', (event) => {
       if (!isDraggingResume) return;
 
+      event.preventDefault();
       if (Math.abs(event.clientY - resumeStartY) > 4) {
         didDragResume = true;
       }
@@ -308,6 +359,12 @@
       isDraggingResume = false;
       resumeToggle.classList.remove('is-dragging');
       resumeContent.classList.remove('resume-dragging');
+      document.body.classList.remove('resume-zipper-dragging');
+      restoreResumeScrollAnchoring();
+      if (resumeScrollFrame) {
+        cancelAnimationFrame(resumeScrollFrame);
+        resumeScrollFrame = null;
+      }
       if (resumeToggleText) {
         resumeToggleText.textContent = resumeProgress >= 0.999 ? 'Open' : 'Reveal';
       }
@@ -322,6 +379,7 @@
 
     resumeToggle.addEventListener('pointerup', finishResumeDrag);
     resumeToggle.addEventListener('pointercancel', finishResumeDrag);
+    resumeToggle.addEventListener('dragstart', (event) => event.preventDefault());
 
     if (resumeAction) {
       resumeAction.addEventListener('click', () => {
