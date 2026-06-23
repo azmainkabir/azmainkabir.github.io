@@ -173,6 +173,56 @@
       });
 
       let portfolioFilters = select('#portfolio-flters li', true);
+      let portfolioItems = select('.portfolio-item', true);
+      let portfolioMoreButton = select('#portfolio-more');
+      let portfolioMoreText = select('.portfolio-more-text');
+      const portfolioPreviewLimit = 3;
+      let portfolioExpanded = false;
+      let activePortfolioFilter = '*';
+
+      const matchesPortfolioFilter = (item, filter) => {
+        return filter === '*' || item.matches(filter);
+      }
+
+      const matchingPortfolioItems = () => {
+        return portfolioItems.filter((item) => matchesPortfolioFilter(item, activePortfolioFilter));
+      }
+
+      const updatePortfolioMoreButton = () => {
+        if (!portfolioMoreButton || !portfolioMoreText) return;
+
+        const hiddenCount = Math.max(matchingPortfolioItems().length - portfolioPreviewLimit, 0);
+        const hasMoreItems = hiddenCount > 0;
+
+        portfolioMoreButton.classList.toggle('d-none', !hasMoreItems);
+        portfolioMoreButton.setAttribute('aria-expanded', portfolioExpanded ? 'true' : 'false');
+        portfolioMoreText.textContent = portfolioExpanded ? 'Show fewer projects' : `See ${hiddenCount} more project${hiddenCount === 1 ? '' : 's'}`;
+
+        let icon = portfolioMoreButton.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('bi-chevron-down', !portfolioExpanded);
+          icon.classList.toggle('bi-chevron-up', portfolioExpanded);
+        }
+      }
+
+      const arrangePortfolio = () => {
+        let visibleCount = 0;
+        portfolioIsotope.arrange({
+          filter: function(itemElem) {
+            const item = itemElem || this;
+            if (!matchesPortfolioFilter(item, activePortfolioFilter)) return false;
+
+            visibleCount += 1;
+            return portfolioExpanded || visibleCount <= portfolioPreviewLimit;
+          }
+        });
+
+        updatePortfolioMoreButton();
+      }
+
+      portfolioIsotope.on('arrangeComplete', function() {
+        AOS.refresh()
+      });
 
       on('click', '#portfolio-flters li', function(e) {
         e.preventDefault();
@@ -181,13 +231,19 @@
         });
         this.classList.add('filter-active');
 
-        portfolioIsotope.arrange({
-          filter: this.getAttribute('data-filter')
-        });
-        portfolioIsotope.on('arrangeComplete', function() {
-          AOS.refresh()
-        });
+        activePortfolioFilter = this.getAttribute('data-filter');
+        portfolioExpanded = false;
+        arrangePortfolio();
       }, true);
+
+      if (portfolioMoreButton) {
+        portfolioMoreButton.addEventListener('click', function() {
+          portfolioExpanded = !portfolioExpanded;
+          arrangePortfolio();
+        });
+      }
+
+      arrangePortfolio();
     }
 
   });
