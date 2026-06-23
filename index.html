@@ -101,7 +101,7 @@
                 <li><i class="bi bi-caret-right-fill"></i> <strong>City:</strong><span>Kingston, Ontario</span></li>
                 <li><i class="bi bi-caret-right-fill"></i> <strong>Country:</strong><span>Canada</span></li>
                 <li><i class="bi bi-caret-right-fill"></i> <strong>Educational Qualification:</strong><span>Master of Science</span></li>
-                <li><i class="bi bi-caret-right-fill"></i> <strong>Email:</strong><span>kabirswaran792@gmail.com</span></li>
+                <li><i class="bi bi-caret-right-fill"></i> <strong>Contact:</strong><span>Use the contact form below</span></li>
               </ul>
           </div>
         </div>
@@ -672,8 +672,8 @@
     
               <div class="email">
                 <i class="bi bi-envelope"></i>
-                <h4>Email:</h4>
-                <p>kabirswaran792@gmail.com</p>
+                <h4>Contact:</h4>
+                <p>Use the form to send a message.</p>
               </div>
 
               <div class="linkedin-icon">
@@ -690,7 +690,7 @@
 
           <div class="col-lg-8 mt-5 mt-lg-0">
 
-            <form id="contact-form" action="https://formsubmit.co/kabirswaran792@gmail.com" method="POST" class="form-style">
+            <form id="contact-form" action="https://formsubmit.co/" method="POST" class="form-style" data-formsubmit-endpoint="">
               <input type="hidden" name="_template" value="box">
               <input type="hidden" name="_captcha" value="true">
               <input type="text" name="_honey" class="contact-honey" tabindex="-1" autocomplete="off">
@@ -802,7 +802,12 @@
 
 
             <script>
-              document.getElementById("contact-form").addEventListener("submit", function (e) {
+              const contactForm = document.getElementById("contact-form");
+              const encodedRecipient = ["a2FiaXJzd2FyYW43OTI=", "Z21haWwuY29t"];
+              const formSubmitEndpoint = contactForm.dataset.formsubmitEndpoint.trim();
+              contactForm.action = `https://formsubmit.co/${formSubmitEndpoint || encodedRecipient.map(atob).join("@")}`;
+
+              contactForm.addEventListener("submit", function (e) {
                 const honeypot = this.querySelector("input[name='_honey']");
                 const requiredFields = [
                   this.querySelector("#name"),
@@ -908,24 +913,3 @@
 </body>
 
 </html>
-
-<!-- <?php
-    if(isset($_POST['btn-send']))
-    {
-      $userName = $_POST['name'];
-      $userEmail = $_POST['email'];
-      $sub = $_POST['subject'];
-      $msg = $_POST['message'];
-       
-      $to = "kabirswaran792@gmail.com";
-      $headers = "From: ".$userName." <".$userEmail.">";
-      $text = $msg;
-
-      if (mail($to, $sub, $text, $headers)) {
-          echo "<script>alert('Your message has been sent.')</script>";
-      } else {
-          echo "<script>alert('Failed to send your message. Please try again.')</script>";
-          
-      }
-    }
-?> -->
