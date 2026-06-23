@@ -84,11 +84,43 @@
   /**
    * Mobile nav toggle
    */
+  const mobileNavToggle = select('.mobile-nav-toggle');
+  const header = select('#header');
+  const closeMobileNav = () => {
+    let body = select('body');
+    if (!body || !body.classList.contains('mobile-nav-active')) return;
+
+    body.classList.remove('mobile-nav-active');
+
+    if (mobileNavToggle) {
+      mobileNavToggle.setAttribute('aria-expanded', 'false');
+      mobileNavToggle.setAttribute('aria-label', 'Open navigation');
+    }
+  }
+
   on('click', '.mobile-nav-toggle', function(e) {
-    select('body').classList.toggle('mobile-nav-active')
-    this.classList.toggle('bi-list')
-    this.classList.toggle('bi-x')
+    e.stopPropagation();
+    const body = select('body');
+    const isOpen = body.classList.toggle('mobile-nav-active');
+
+    this.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    this.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
   })
+
+  document.addEventListener('click', (event) => {
+    const body = select('body');
+    if (!body || !body.classList.contains('mobile-nav-active')) return;
+    if (header && header.contains(event.target)) return;
+    if (mobileNavToggle && mobileNavToggle.contains(event.target)) return;
+
+    closeMobileNav();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeMobileNav();
+    }
+  });
 
   /**
    * Scrool with ofset on links with a class name .scrollto
@@ -99,10 +131,7 @@
 
       let body = select('body')
       if (body.classList.contains('mobile-nav-active')) {
-        body.classList.remove('mobile-nav-active')
-        let navbarToggle = select('.mobile-nav-toggle')
-        navbarToggle.classList.toggle('bi-list')
-        navbarToggle.classList.toggle('bi-x')
+        closeMobileNav()
       }
       scrollto(this.hash)
     }

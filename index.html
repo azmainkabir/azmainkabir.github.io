@@ -35,16 +35,21 @@
 <body class="dark-mode">
 
   <!-- ======= Mobile nav toggle button ======= -->
-  <i class="bi bi-list mobile-nav-toggle d-xl-none"></i>
+  <button class="mobile-nav-toggle d-xl-none" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="header">
+    <span class="mobile-nav-toggle-icons" aria-hidden="true">
+      <span class="nav-line nav-line-top"></span>
+      <span class="nav-line nav-line-middle"></span>
+      <span class="nav-line nav-line-bottom"></span>
+    </span>
+  </button>
+  <button id="dark-mode-toggle" class="dark-mode-button" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+    <span class="theme-icon-morph" aria-hidden="true">
+      <i class="bx bx-moon icon-moon"></i>
+      <i class="bx bx-sun icon-sun"></i>
+    </span>
+  </button>
   <!-- ======= Header ======= -->
   <header id="header" class="d-flex flex-column justify-content-center">
-      
-    <button id="dark-mode-toggle" class="dark-mode-button" type="button" aria-label="Switch to dark mode" aria-pressed="false">
-      <span class="theme-icon-morph" aria-hidden="true">
-        <i class="bx bx-moon icon-moon"></i>
-        <i class="bx bx-sun icon-sun"></i>
-      </span>
-    </button>
 
     <nav id="navbar" class="navbar nav-menu">
       <ul>
