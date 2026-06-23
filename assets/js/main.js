@@ -193,6 +193,9 @@
       resumeToggle.style.setProperty('--zipper-progress-fill', `${trackFill * resumeProgress}px`);
       resumeToggle.style.setProperty('--zipper-pull-offset', `${trackTravel * resumeProgress}px`);
       resumeToggle.style.setProperty('--zipper-pull-rotation', `${resumeProgress * 180}deg`);
+      resumeToggle.style.setProperty('--zipper-spread', `${5 + (resumeProgress * 8)}px`);
+      resumeToggle.style.setProperty('--zipper-open-opacity', `${0.36 + (resumeProgress * 0.64)}`);
+      resumeToggle.style.setProperty('--zipper-closed-opacity', `${0.98 - (resumeProgress * 0.08)}`);
 
       resumeContent.classList.toggle('resume-collapsed', resumeProgress <= 0.001);
       resumeContent.classList.toggle('resume-expanded', resumeProgress >= 0.999);

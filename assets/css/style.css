@@ -1244,6 +1244,9 @@ main > section:nth-of-type(even)::after {
   --zipper-progress-fill: 0%;
   --zipper-pull-offset: 0px;
   --zipper-pull-rotation: 0deg;
+  --zipper-spread: 4px;
+  --zipper-open-opacity: 0.42;
+  --zipper-closed-opacity: 0.98;
   position: relative;
   display: inline-grid;
   grid-template-columns: 1fr;
@@ -1275,6 +1278,12 @@ main > section:nth-of-type(even)::after {
 .resume .resume-zipper-button.is-dragging,
 .resume .resume-zipper-button.is-dragging::before,
 .resume .resume-zipper-button.is-dragging i,
+.resume .resume-zipper-button.is-dragging .zipper-open-teeth,
+.resume .resume-zipper-button.is-dragging .zipper-open-teeth::before,
+.resume .resume-zipper-button.is-dragging .zipper-open-teeth::after,
+.resume .resume-zipper-button.is-dragging .zipper-teeth,
+.resume .resume-zipper-button.is-dragging .zipper-teeth::before,
+.resume .resume-zipper-button.is-dragging .zipper-teeth::after,
 .resume .resume-zipper-button.is-dragging .zipper-track::before,
 .resume .resume-zipper-button.is-dragging .zipper-pull {
   transition: none;
@@ -1318,32 +1327,81 @@ main > section:nth-of-type(even)::after {
 }
 
 .resume .zipper-track::before {
+  display: none;
+}
+
+.resume .zipper-open-teeth {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 34px;
+  height: calc(12px + var(--zipper-pull-offset));
+  transform: translateX(-50%);
+  overflow: hidden;
+  opacity: var(--zipper-open-opacity);
+  transition: height 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+  z-index: 2;
+}
+
+.resume .zipper-open-teeth::before,
+.resume .zipper-open-teeth::after {
   content: "";
   position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
-  height: var(--zipper-progress-fill);
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.16)),
+    repeating-linear-gradient(180deg, #ffffff 0 2px, transparent 2px 6px);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 204, 77, 0.95), rgba(255, 255, 255, 0.74));
-  box-shadow: 0 0 18px rgba(255, 204, 77, 0.35);
-  transition: height 0.25s ease;
-  z-index: 1;
+  opacity: 0.92;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.resume .zipper-open-teeth::before {
+  left: 50%;
+  transform: translateX(calc(-50% - var(--zipper-spread)));
+}
+
+.resume .zipper-open-teeth::after {
+  right: 50%;
+  transform: translateX(calc(50% + var(--zipper-spread)));
 }
 
 .resume .zipper-teeth {
   position: absolute;
   left: 50%;
-  top: 14px;
+  top: calc(14px + var(--zipper-pull-offset));
   bottom: 14px;
-  width: 9px;
+  width: 22px;
   transform: translateX(-50%);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.18)),
-    repeating-linear-gradient(180deg, #ffffff 0 3px, transparent 3px 7px);
-  border-radius: 999px;
-  opacity: 0.92;
+  background: transparent;
+  opacity: var(--zipper-closed-opacity);
+  transition: top 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
   z-index: 2;
+}
+
+.resume .zipper-teeth::before,
+.resume .zipper-teeth::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.16)),
+    repeating-linear-gradient(180deg, #ffffff 0 2px, transparent 2px 6px);
+}
+
+.resume .zipper-teeth::before {
+  left: 50%;
+  transform: translateX(-7px);
+}
+
+.resume .zipper-teeth::after {
+  right: 50%;
+  transform: translateX(7px);
 }
 
 .resume .zipper-pull {
@@ -1538,6 +1596,12 @@ main > section:nth-of-type(even)::after {
   .resume .resume-zipper-button::before,
   .resume .resume-action-button,
   .resume .resume-action-button::before,
+  .resume .zipper-open-teeth,
+  .resume .zipper-open-teeth::before,
+  .resume .zipper-open-teeth::after,
+  .resume .zipper-teeth,
+  .resume .zipper-teeth::before,
+  .resume .zipper-teeth::after,
   .resume .zipper-pull,
   .resume .zipper-track::before,
   .resume .resume-content::after,
@@ -2685,15 +2749,13 @@ body.dark-mode .resume .zipper-track {
   box-shadow: inset 0 0 0 1px rgba(128, 216, 255, 0.18);
 }
 
-body.dark-mode .resume .zipper-track::before {
-  background: linear-gradient(180deg, rgba(0, 220, 209, 0.92), rgba(128, 216, 255, 0.8));
-  box-shadow: 0 0 18px rgba(0, 220, 209, 0.32);
-}
-
-body.dark-mode .resume .zipper-teeth {
+body.dark-mode .resume .zipper-open-teeth::before,
+body.dark-mode .resume .zipper-open-teeth::after,
+body.dark-mode .resume .zipper-teeth::before,
+body.dark-mode .resume .zipper-teeth::after {
   background:
     linear-gradient(180deg, rgba(128, 216, 255, 0.28), rgba(128, 216, 255, 0.14)),
-    repeating-linear-gradient(180deg, rgba(230, 247, 255, 0.92) 0 3px, transparent 3px 7px);
+    repeating-linear-gradient(180deg, rgba(230, 247, 255, 0.92) 0 2px, transparent 2px 6px);
 }
 
 body.dark-mode .resume .zipper-pull {
