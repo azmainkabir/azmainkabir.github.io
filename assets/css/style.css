@@ -367,17 +367,18 @@ h6 {
 }
 
 .mobile-nav-active .mobile-nav-toggle {
-  color: #fff;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent 46%),
-    linear-gradient(135deg, rgba(0, 136, 129, 0.98), rgba(5, 99, 187, 0.98)),
-    #008881;
-  box-shadow: 0 20px 42px rgba(0, 136, 129, 0.3), 0 10px 22px rgba(5, 99, 187, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  color: #0563bb;
+  background: transparent;
+  box-shadow: none;
 }
 
 .mobile-nav-active .mobile-nav-toggle::before {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05));
+  background: transparent;
   transform: none;
+}
+
+.mobile-nav-active .mobile-nav-toggle .nav-line {
+  background: #0563bb;
 }
 
 .mobile-nav-active .mobile-nav-toggle .nav-line-top {
@@ -3182,15 +3183,12 @@ body.dark-mode .mobile-nav-toggle::before {
 }
 
 body.dark-mode.mobile-nav-active .mobile-nav-toggle {
-  background:
-    linear-gradient(145deg, rgba(128, 216, 255, 0.14), transparent 46%),
-    linear-gradient(135deg, rgba(8, 28, 38, 0.98), rgba(10, 18, 27, 0.98)),
-    #111923;
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.36), 0 10px 22px rgba(128, 216, 255, 0.18);
+  background: transparent;
+  box-shadow: none;
 }
 
 body.dark-mode.mobile-nav-active .mobile-nav-toggle::before {
-  background: linear-gradient(145deg, rgba(128, 216, 255, 0.13), rgba(128, 216, 255, 0.04));
+  background: transparent;
 }
 
 .dark-mode-button {
