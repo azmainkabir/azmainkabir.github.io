@@ -690,8 +690,10 @@
 
           <div class="col-lg-8 mt-5 mt-lg-0">
 
-            <form action="https://formsubmit.co/kabirswaran792@gmail.com" method="POST" class="form-style">
+            <form id="contact-form" action="https://formsubmit.co/kabirswaran792@gmail.com" method="POST" class="form-style">
               <input type="hidden" name="_template" value="box">
+              <input type="hidden" name="_captcha" value="true">
+              <input type="text" name="_honey" class="contact-honey" tabindex="-1" autocomplete="off">
 
               <div class="row">
                 <div class="col-md-6 form-group">
@@ -800,15 +802,31 @@
 
 
             <script>
-              document.querySelector("form").addEventListener("submit", function (e) {
-                const name = document.querySelector("input[name='name']").value.trim();
-                const subject = document.querySelector("input[name='subject']").value.trim();
-                const message = document.querySelector("textarea[name='message']").value.trim();
+              document.getElementById("contact-form").addEventListener("submit", function (e) {
+                const honeypot = this.querySelector("input[name='_honey']");
+                const requiredFields = [
+                  this.querySelector("#name"),
+                  this.querySelector("#email"),
+                  this.querySelector("#subject"),
+                  this.querySelector("#message")
+                ];
 
-                if (name === "" || subject === "" || message === "") {
+                if (honeypot.value !== "") {
+                  e.preventDefault();
+                  return;
+                }
+
+                const hasEmptyField = requiredFields.some((field) => field.value.trim() === "");
+
+                if (hasEmptyField) {
                   alert("Please fill in all fields with valid content.");
                   e.preventDefault();
+                  return;
                 }
+
+                requiredFields.forEach((field) => {
+                  field.value = field.value.trim();
+                });
               });
             </script>
 

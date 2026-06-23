@@ -934,6 +934,10 @@ section {
   padding-bottom: 8px;
 }
 
+.contact .form-style .contact-honey {
+  display: none;
+}
+
 .contact .form-style input,
 .contact .form-style textarea {
   border-radius: 4px;
