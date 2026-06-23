@@ -2840,7 +2840,13 @@ body.dark-mode .contact .form-style textarea {
   background: rgba(42, 42, 42, 0.84);
   border-color: rgba(128, 216, 255, 0.2);
   color: #e0e0e0;
+  caret-color: #80d8ff;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+}
+
+body.dark-mode .contact .form-style input::placeholder,
+body.dark-mode .contact .form-style textarea::placeholder {
+  color: rgba(224, 224, 224, 0.58);
 }
 
 body.dark-mode .contact .form-style input:focus,
@@ -2848,6 +2854,19 @@ body.dark-mode .contact .form-style textarea:focus {
   background: #2a2a2a;
   border-color: rgba(128, 216, 255, 0.52);
   box-shadow: 0 12px 30px rgba(64, 196, 255, 0.14), 0 0 0 4px rgba(128, 216, 255, 0.08);
+}
+
+body.dark-mode .contact .form-style input:-webkit-autofill,
+body.dark-mode .contact .form-style input:-webkit-autofill:hover,
+body.dark-mode .contact .form-style input:-webkit-autofill:focus,
+body.dark-mode .contact .form-style textarea:-webkit-autofill,
+body.dark-mode .contact .form-style textarea:-webkit-autofill:hover,
+body.dark-mode .contact .form-style textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #e0e0e0;
+  caret-color: #80d8ff;
+  box-shadow: 0 0 0 1000px #2a2a2a inset, 0 12px 30px rgba(64, 196, 255, 0.14);
+  border-color: rgba(128, 216, 255, 0.36);
+  transition: background-color 9999s ease-out, color 9999s ease-out;
 }
 
 body.dark-mode .contact .form-style .field-shell i {
