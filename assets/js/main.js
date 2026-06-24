@@ -283,7 +283,7 @@
           return ['azmain-kabir'];
 
         case 'uname':
-          return ['AzmainOS portfolio-shell 1.0 developer-tools ai-research observability'];
+          return ['Azmain portfolio-shell'];
 
         case 'date':
           return [new Date().toLocaleString()];
