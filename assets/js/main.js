@@ -169,7 +169,7 @@
     const terminalFileNames = ['about', 'skills', 'work', 'research', 'resume', 'projects', 'contact'];
     const defaultTerminalLines = [
       'Azmain website shell',
-      'type help, ls, cat skills, grep grafana work, or cd contact'
+      'type help, ls, cat skills, grep python work, or cd contact'
     ];
     const terminalCommands = ['cat', 'cd', 'clear', 'date', 'echo', 'find', 'grep', 'help', 'history', 'ls', 'man', 'open', 'pwd', 'sudo', 'tree', 'uname', 'whoami'];
     const terminalHistory = [];
@@ -566,6 +566,7 @@
       }
     });
 
+    renderTerminalLines(defaultTerminalLines);
     syncTerminalPrompt();
   }
 
