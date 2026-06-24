@@ -212,6 +212,12 @@
 
     const tokenizeTerminalCommand = (value) => value.match(/"[^"]*"|'[^']*'|\S+/g)?.map((part) => part.replace(/^["']|["']$/g, '')) || [];
 
+    const moveTerminalCaretToEnd = () => {
+      if (!heroTerminalInput) return;
+      const endPosition = heroTerminalInput.value.length;
+      heroTerminalInput.setSelectionRange(endPosition, endPosition);
+    }
+
     const renderTerminalLines = (lines) => {
       if (!heroTerminalOutput) return;
       heroTerminalOutput.innerHTML = '';
@@ -388,6 +394,7 @@
 
       if (matches.length === 1) {
         heroTerminalInput.value = `${value.slice(0, value.length - activeToken.length)}${matches[0]}`;
+        moveTerminalCaretToEnd();
       } else if (matches.length > 1) {
         renderTerminalResult(value || 'tab', matches);
       }
@@ -425,12 +432,14 @@
         event.preventDefault();
         terminalHistoryIndex = Math.max(terminalHistoryIndex - 1, 0);
         heroTerminalInput.value = terminalHistory[terminalHistoryIndex] || '';
+        moveTerminalCaretToEnd();
       }
 
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         terminalHistoryIndex = Math.min(terminalHistoryIndex + 1, terminalHistory.length);
         heroTerminalInput.value = terminalHistory[terminalHistoryIndex] || '';
+        moveTerminalCaretToEnd();
       }
 
       if (event.key === 'Tab') {
