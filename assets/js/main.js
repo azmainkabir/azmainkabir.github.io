@@ -166,11 +166,6 @@
     const heroTerminalInput = select('#hero-terminal-input');
     const heroTerminalOutput = select('#hero-terminal-output');
     const heroTerminalPrompt = select('.hero-console-prompt');
-    const terminalFileNames = ['about', 'skills', 'work', 'research', 'resume', 'projects', 'contact'];
-    const defaultTerminalLines = [
-      'Azmain website shell',
-      'type help, ls, cat skills, grep python work, or cd contact'
-    ];
     const terminalCommands = ['cat', 'cd', 'clear', 'date', 'echo', 'find', 'grep', 'help', 'history', 'ls', 'man', 'open', 'pwd', 'sudo', 'tree', 'uname', 'whoami'];
     const terminalHistory = [];
     let terminalHistoryIndex = 0;
@@ -179,6 +174,12 @@
     const tokenizeTerminalCommand = (value) => value.match(/"[^"]*"|'[^']*'|\S+/g)?.map((part) => part.replace(/^["']|["']$/g, '')) || [];
 
     const cleanTerminalText = (value) => value.replace(/\s+/g, ' ').trim();
+
+    const slugTerminalName = (value) => cleanTerminalText(value)
+      .toLowerCase()
+      .replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
 
     const getTerminalText = (selector, fallback = '', root = document) => {
       const element = root.querySelector(selector);
@@ -274,35 +275,125 @@
       return projects.length ? [...projects, 'Use cd portfolio to jump to the project section.'] : ['No portfolio items found.'];
     }
 
-    const terminalFileReaders = {
-      about: () => [
-        getTerminalText('#hero h1', 'Azmain Kabir'),
-        getTerminalText('#hero .hero-summary'),
-        getTerminalText('#about .section-title p'),
-        getTerminalText('#about .content h3')
-      ].filter(Boolean),
-      skills: () => [
-        `Focus: ${getTerminalTexts('#hero .tech-chip').join(', ')}`,
-        ...select('#skills .skill', true).map(getSkillLabel)
-      ].filter((line) => line !== 'Focus: '),
-      work: () => getResumeGroups()['Work Experience'] || ['No work experience entries found.'],
-      research: () => [
-        ...(getResumeGroups()['Research Papers'] || []),
-        ...(getResumeGroups()['Research Talks'] || [])
-      ],
-      resume: () => {
-        const groups = getResumeGroups();
-        const lines = Object.entries(groups).map(([title, items]) => `${title}: ${items.length} ${items.length === 1 ? 'entry' : 'entries'}`);
-        return [...lines, 'Use cd resume to jump to the full resume section.'];
-      },
-      projects: getPortfolioLines,
-      contact: getContactLines
-    };
+    const getTestimonialsLines = () => {
+      const testimonials = select('#testimonials .testimonial-item', true).map((item) => {
+        const name = getTerminalText('h3', '', item);
+        const role = getTerminalText('h5', '', item) || getTerminalText('h4', '', item);
+        const quote = getTerminalText('p', '', item);
+        return [name, role ? `(${role})` : '', quote ? `- ${quote}` : ''].filter(Boolean).join(' ');
+      }).filter(Boolean);
+
+      return testimonials.length ? testimonials : ['No testimonials found.'];
+    }
+
+    const getGenericSectionLines = (section) => {
+      const title = getTerminalText('.section-title h2', section.id, section);
+      const intro = getTerminalText('.section-title p', '', section);
+      return [title, intro].filter(Boolean);
+    }
+
+    const getSectionReader = (section) => {
+      const sectionReaders = {
+        about: () => [
+          getTerminalText('#hero h1', 'Azmain Kabir'),
+          getTerminalText('#hero .hero-summary'),
+          getTerminalText('#about .section-title p'),
+          getTerminalText('#about .content h3')
+        ].filter(Boolean),
+        skills: () => [
+          `Focus: ${getTerminalTexts('#hero .tech-chip').join(', ')}`,
+          ...select('#skills .skill', true).map(getSkillLabel)
+        ].filter((line) => line !== 'Focus: '),
+        resume: () => {
+          const groups = getResumeGroups();
+          const lines = Object.entries(groups).map(([title, items]) => `${title}: ${items.length} ${items.length === 1 ? 'entry' : 'entries'}`);
+          return [...lines, 'Use cd resume to jump to the full resume section.'];
+        },
+        portfolio: getPortfolioLines,
+        testimonials: getTestimonialsLines,
+        contact: getContactLines
+      };
+
+      return sectionReaders[section.id] || (() => getGenericSectionLines(section));
+    }
+
+    const getTerminalFiles = () => {
+      const files = {};
+
+      const addFile = (name, reader, route, hidden = false) => {
+        const fileName = slugTerminalName(name);
+        if (!fileName || files[fileName]) return;
+        files[fileName] = { reader, route, hidden };
+      }
+
+      select('main > section[id]', true).forEach((section) => {
+        addFile(section.id, getSectionReader(section), `#${section.id}`);
+        if (section.id === 'portfolio') {
+          addFile('projects', getPortfolioLines, '#portfolio');
+        }
+      });
+
+      const resumeGroups = getResumeGroups();
+      const groupedResumeAliases = {};
+
+      Object.entries(resumeGroups).forEach(([title, items]) => {
+        const slug = slugTerminalName(title);
+        const firstWord = slug.split('-')[0];
+        const reader = () => items;
+
+        if (firstWord && firstWord !== slug) {
+          addFile(slug, reader, '#resume', true);
+          groupedResumeAliases[firstWord] = groupedResumeAliases[firstWord] || [];
+          groupedResumeAliases[firstWord].push({ title, items });
+        } else {
+          addFile(slug, reader, '#resume');
+        }
+      });
+
+      Object.entries(groupedResumeAliases).forEach(([alias, groups]) => {
+        addFile(alias, () => groups.flatMap((group) => group.items), '#resume');
+      });
+
+      return files;
+    }
+
+    const getTerminalFileNames = (includeHidden = false) => Object.entries(getTerminalFiles())
+      .filter(([, file]) => includeHidden || !file.hidden)
+      .map(([fileName]) => fileName);
+
+    const getTerminalRoutes = () => Object.entries(getTerminalFiles()).reduce((routes, [fileName, file]) => {
+      routes[fileName] = file.route;
+      return routes;
+    }, {
+      '~': '#hero',
+      home: '#hero',
+      '..': '#hero'
+    });
+
+    const getTerminalExternalLinks = () => select('#hero .social-links a', true).reduce((links, link) => {
+      const label = slugTerminalName(link.getAttribute('aria-label') || link.className);
+      if (label && link.href) {
+        links[label] = link.href;
+      }
+      return links;
+    }, {});
+
+    const getDefaultTerminalLines = () => {
+      const files = getTerminalFileNames();
+      const catExample = files.includes('skills') ? 'skills' : files[0] || 'about';
+      const grepExample = files.includes('work') ? 'work' : catExample;
+      const navExample = files.includes('contact') ? 'cd contact' : 'ls';
+
+      return [
+        'Azmain website shell',
+        `type help, ls, cat ${catExample}, grep python ${grepExample}, or ${navExample}`
+      ];
+    }
 
     const readTerminalFile = (fileName) => {
-      const reader = terminalFileReaders[fileName];
-      if (!reader) return null;
-      const lines = reader().filter(Boolean);
+      const file = getTerminalFiles()[slugTerminalName(fileName)];
+      if (!file) return null;
+      const lines = file.reader().filter(Boolean);
       return lines.length ? lines : [`${fileName}: no page content found`];
     }
 
@@ -343,9 +434,9 @@
       'ls, tree, pwd, whoami, uname, date, history, clear',
       'cat <file>, grep <term> <file>, echo <text>',
       'Navigation:',
-      'cd about | skills | work | research | resume | portfolio | projects | contact | ..',
-      'open github | linkedin | x | portfolio | resume | contact',
-      `Files: ${terminalFileNames.join(', ')}`
+      `cd ${getTerminalFileNames().join(' | ')} | ..`,
+      `open ${Object.keys(getTerminalExternalLinks()).join(' | ')} | <file>`,
+      `Files: ${getTerminalFileNames().join(', ')}`
     ];
 
     const runTerminalCommand = (rawCommand) => {
@@ -353,9 +444,9 @@
       const command = (parts[0] || '').toLowerCase();
       const args = parts.slice(1);
 
-      if (!command) return defaultTerminalLines;
+      if (!command) return getDefaultTerminalLines();
 
-      if (terminalFileNames.includes(command)) {
+      if (getTerminalFileNames(true).includes(command)) {
         return readTerminalFile(command);
       }
 
@@ -365,7 +456,7 @@
           return terminalHelp();
 
         case 'clear':
-          return defaultTerminalLines;
+          return getDefaultTerminalLines();
 
         case 'ls':
           if (currentTerminalPath === '~/resume') {
@@ -384,11 +475,11 @@
             return getTerminalTexts('#hero .tech-chip');
           }
 
-          return terminalFileNames;
+          return getTerminalFileNames();
 
         case 'tree':
         case 'find':
-          return ['.', ...terminalFileNames.map((fileName) => `./${fileName}`)];
+          return ['.', ...getTerminalFileNames().map((fileName) => `./${fileName}`)];
 
         case 'pwd':
           return [`/home/azmain/website${currentTerminalPath.replace('~', '')}`];
@@ -410,13 +501,13 @@
 
         case 'cat': {
           const file = (args[0] || '').toLowerCase();
-          return readTerminalFile(file) || [`cat: ${args[0] || ''}: no such portfolio file`, `try: cat ${terminalFileNames.join(' | cat ')}`];
+          return readTerminalFile(file) || [`cat: ${args[0] || ''}: no such portfolio file`, `try: cat ${getTerminalFileNames().join(' | cat ')}`];
         }
 
         case 'grep': {
           const term = (args[0] || '').toLowerCase();
           const file = (args[1] || '').toLowerCase();
-          const filesToSearch = readTerminalFile(file) ? [file] : terminalFileNames;
+          const filesToSearch = readTerminalFile(file) ? [file] : getTerminalFileNames();
           const matches = [];
 
           if (!term) return ['usage: grep <term> [file]'];
@@ -434,22 +525,10 @@
 
         case 'cd': {
           const target = (args[0] || '~').toLowerCase();
-          const routes = {
-            '~': '#hero',
-            home: '#hero',
-            '..': '#hero',
-            about: '#about',
-            skills: '#skills',
-            work: '#resume',
-            research: '#resume',
-            resume: '#resume',
-            portfolio: '#portfolio',
-            projects: '#portfolio',
-            contact: '#contact'
-          };
+          const routes = getTerminalRoutes();
 
           if (!routes[target]) {
-            return [`cd: ${args[0] || ''}: no such section`, 'try: cd about, cd resume, cd portfolio, or cd contact'];
+            return [`cd: ${args[0] || ''}: no such section`, `try: cd ${getTerminalFileNames().slice(0, 6).join(', cd ')}`];
           }
 
           currentTerminalPath = target === '~' || target === 'home' || target === '..' ? '~' : `~/${target}`;
@@ -460,22 +539,8 @@
 
         case 'open': {
           const target = (args[0] || '').toLowerCase();
-          const socialLinks = {
-            github: select('#hero .social-links .github')?.href,
-            linkedin: select('#hero .social-links .linkedin')?.href,
-            x: select('#hero .social-links .twitter')?.href
-          };
-          const links = {
-            github: socialLinks.github,
-            linkedin: socialLinks.linkedin,
-            x: socialLinks.x
-          };
-          const routes = {
-            portfolio: '#portfolio',
-            projects: '#portfolio',
-            contact: '#contact',
-            resume: '#resume'
-          };
+          const links = getTerminalExternalLinks();
+          const routes = getTerminalRoutes();
 
           if (links[target]) {
             window.open(links[target], '_blank', 'noopener,noreferrer');
@@ -487,7 +552,7 @@
             return [`opening ${target}`];
           }
 
-          return ['usage: open github | linkedin | x | portfolio | resume | contact'];
+          return [`usage: open ${Object.keys(links).join(' | ')} | ${getTerminalFileNames().slice(0, 6).join(' | ')}`];
         }
 
         case 'sudo':
@@ -496,7 +561,7 @@
         default:
           return [
             `${command}: command not found`,
-            'try help, ls, cat skills, grep python work, or cd contact'
+            getDefaultTerminalLines()[1].replace('type ', 'try ')
           ];
       }
     }
@@ -507,7 +572,7 @@
       const value = heroTerminalInput.value;
       const parts = tokenizeTerminalCommand(value);
       const activeToken = parts[parts.length - 1] || '';
-      const candidates = [...terminalCommands, ...terminalFileNames, 'about', 'resume', 'portfolio', 'projects', 'contact', 'github', 'linkedin', 'x'];
+      const candidates = [...terminalCommands, ...getTerminalFileNames(true), ...Object.keys(getTerminalExternalLinks())];
       const matches = candidates.filter((candidate) => candidate.startsWith(activeToken.toLowerCase()));
 
       if (matches.length === 1) {
@@ -525,7 +590,7 @@
       const rawCommand = heroTerminalInput.value.trim();
 
       if (!rawCommand) {
-        renderTerminalLines(defaultTerminalLines);
+        renderTerminalLines(getDefaultTerminalLines());
         return;
       }
 
@@ -534,7 +599,7 @@
       terminalHistoryIndex = terminalHistory.length;
 
       if (rawCommand.toLowerCase() === 'clear') {
-        renderTerminalLines(defaultTerminalLines);
+        renderTerminalLines(getDefaultTerminalLines());
         heroTerminalInput.value = '';
         return;
       }
@@ -566,7 +631,7 @@
       }
     });
 
-    renderTerminalLines(defaultTerminalLines);
+    renderTerminalLines(getDefaultTerminalLines());
     syncTerminalPrompt();
   }
 
