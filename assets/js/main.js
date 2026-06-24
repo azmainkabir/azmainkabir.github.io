@@ -28,7 +28,7 @@
   }
 
   /**
-   * Easy on scroll event listener 
+   * Easy on scroll event listener
    */
   const onscroll = (el, listener) => {
     el.addEventListener('scroll', listener)
@@ -155,6 +155,288 @@
   if (preloader) {
     window.addEventListener('load', () => {
       preloader.remove()
+    });
+  }
+
+  /**
+   * Hero interactive console
+   */
+  const heroTerminal = select('#hero-terminal');
+  if (heroTerminal) {
+    const heroTerminalInput = select('#hero-terminal-input');
+    const heroTerminalOutput = select('#hero-terminal-output');
+    const terminalFileNames = ['about', 'skills', 'work', 'research', 'resume', 'projects', 'contact'];
+    const terminalFiles = {
+      about: [
+        'Azmain Kabir',
+        'Software engineer and researcher focused on developer tools, automation, observability, and AI-assisted software engineering.'
+      ],
+      skills: [
+        'Python, FastAPI, React, TypeScript, Java, SQL',
+        'Grafana plugin development, CI/CD analytics, Playwright automation',
+        'GitHub APIs, data pipelines, RAG systems, LLM-assisted analysis'
+      ],
+      work: [
+        'Queen\'s University: research infrastructure for software repositories, pull requests, CI/CD, tests, and developer workflows.',
+        'Huawei Canada: Grafana visualization plugins, performance dashboards, log pipelines, RAG backend, and automation tooling.',
+        'MASTER WiZR: QA strategy, regression workflows, test plans, and release reliability.'
+      ],
+      research: [
+        'Software analytics and mining software repositories',
+        'LLM-assisted software development practices',
+        'Retrieval-augmented prompting and reproducible research artifacts',
+        'Publications: ZS4C, P4OMP, and medical imaging classification work'
+      ],
+      resume: [
+        'Work: Queen\'s University, Huawei Canada, University of Manitoba, MASTER WiZR',
+        'Education: M.Sc. Computer Science, University of Manitoba',
+        'Use cd resume to jump to the full resume section.'
+      ],
+      projects: [
+        'Portfolio projects include web interfaces, UI/UX work, app prototypes, and observability tooling.',
+        'Use cd portfolio to jump to the project section.'
+      ],
+      contact: [
+        'Use cd contact to jump to the contact form.',
+        'External profiles: LinkedIn, GitHub, and X are linked on this page.'
+      ]
+    };
+    const defaultTerminalLines = [
+      'Azmain portfolio shell',
+      'type help, ls, cat skills, grep python work, or cd contact'
+    ];
+    const terminalCommands = ['cat', 'cd', 'clear', 'date', 'echo', 'find', 'grep', 'help', 'history', 'ls', 'man', 'open', 'pwd', 'sudo', 'tree', 'uname', 'whoami'];
+    const terminalHistory = [];
+    let terminalHistoryIndex = 0;
+    let currentTerminalPath = '~';
+
+    const tokenizeTerminalCommand = (value) => value.match(/"[^"]*"|'[^']*'|\S+/g)?.map((part) => part.replace(/^["']|["']$/g, '')) || [];
+
+    const renderTerminalLines = (lines) => {
+      if (!heroTerminalOutput) return;
+      heroTerminalOutput.innerHTML = '';
+      lines.forEach((line) => {
+        const terminalLine = document.createElement('span');
+        terminalLine.textContent = line;
+        heroTerminalOutput.appendChild(terminalLine);
+      });
+      heroTerminalOutput.scrollTop = 0;
+    }
+
+    const renderTerminalResult = (rawCommand, lines, promptPath = currentTerminalPath) => {
+      renderTerminalLines([`${promptPath} $ ${rawCommand}`, ...lines]);
+    }
+
+    const scrollTerminalTo = (sectionId) => {
+      setTimeout(() => scrollto(sectionId), 250);
+    }
+
+    const terminalHelp = () => [
+      'Linux-style commands:',
+      'ls, tree, pwd, whoami, uname, date, history, clear',
+      'cat <file>, grep <term> <file>, echo <text>',
+      'Navigation:',
+      'cd about | resume | portfolio | contact',
+      'open github | linkedin | x | portfolio | resume | contact',
+      `Files: ${terminalFileNames.join(', ')}`
+    ];
+
+    const runTerminalCommand = (rawCommand) => {
+      const parts = tokenizeTerminalCommand(rawCommand);
+      const command = (parts[0] || '').toLowerCase();
+      const args = parts.slice(1);
+
+      if (!command) return defaultTerminalLines;
+
+      if (terminalFileNames.includes(command)) {
+        return terminalFiles[command];
+      }
+
+      switch (command) {
+        case 'help':
+        case 'man':
+          return terminalHelp();
+
+        case 'clear':
+          return defaultTerminalLines;
+
+        case 'ls':
+          return terminalFileNames;
+
+        case 'tree':
+        case 'find':
+          return [
+            '.',
+            './about',
+            './skills',
+            './work',
+            './research',
+            './resume',
+            './projects',
+            './contact'
+          ];
+
+        case 'pwd':
+          return [`/home/azmain/portfolio${currentTerminalPath.replace('~', '')}`];
+
+        case 'whoami':
+          return ['azmain-kabir'];
+
+        case 'uname':
+          return ['AzmainOS portfolio-shell 1.0 developer-tools ai-research observability'];
+
+        case 'date':
+          return [new Date().toLocaleString()];
+
+        case 'history':
+          return terminalHistory.length ? terminalHistory.map((item, index) => `${index + 1}  ${item}`) : ['history is empty'];
+
+        case 'echo':
+          return [args.join(' ')];
+
+        case 'cat': {
+          const file = (args[0] || '').toLowerCase();
+          return terminalFiles[file] || [`cat: ${args[0] || ''}: no such portfolio file`, `try: cat ${terminalFileNames.join(' | cat ')}`];
+        }
+
+        case 'grep': {
+          const term = (args[0] || '').toLowerCase();
+          const file = (args[1] || '').toLowerCase();
+          const filesToSearch = terminalFiles[file] ? [file] : terminalFileNames;
+          const matches = [];
+
+          if (!term) return ['usage: grep <term> [file]'];
+
+          filesToSearch.forEach((fileName) => {
+            terminalFiles[fileName].forEach((line) => {
+              if (line.toLowerCase().includes(term)) {
+                matches.push(`${fileName}: ${line}`);
+              }
+            });
+          });
+
+          return matches.length ? matches : [`grep: no matches for "${term}"`];
+        }
+
+        case 'cd': {
+          const target = (args[0] || '~').toLowerCase();
+          const routes = {
+            '~': '#hero',
+            home: '#hero',
+            about: '#about',
+            resume: '#resume',
+            portfolio: '#portfolio',
+            projects: '#portfolio',
+            contact: '#contact'
+          };
+
+          if (!routes[target]) {
+            return [`cd: ${args[0] || ''}: no such section`, 'try: cd about, cd resume, cd portfolio, or cd contact'];
+          }
+
+          currentTerminalPath = target === '~' || target === 'home' ? '~' : `~/${target}`;
+          scrollTerminalTo(routes[target]);
+          return [`navigating to ${target === '~' ? 'home' : target}`];
+        }
+
+        case 'open': {
+          const target = (args[0] || '').toLowerCase();
+          const links = {
+            github: 'https://github.com/azmainkabir',
+            linkedin: 'https://www.linkedin.com/in/azmain-kabir',
+            x: 'https://x.com/Swaran792'
+          };
+          const routes = {
+            portfolio: '#portfolio',
+            projects: '#portfolio',
+            contact: '#contact',
+            resume: '#resume'
+          };
+
+          if (links[target]) {
+            window.open(links[target], '_blank', 'noopener,noreferrer');
+            return [`opening ${target}`];
+          }
+
+          if (routes[target]) {
+            scrollTerminalTo(routes[target]);
+            return [`opening ${target}`];
+          }
+
+          return ['usage: open github | linkedin | x | portfolio | resume | contact'];
+        }
+
+        case 'sudo':
+          return ['permission denied: this portfolio does not need sudo'];
+
+        default:
+          return [
+            `${command}: command not found`,
+            'try help, ls, cat skills, grep python work, or cd contact'
+          ];
+      }
+    }
+
+    const autocompleteTerminalCommand = () => {
+      if (!heroTerminalInput) return;
+
+      const value = heroTerminalInput.value;
+      const parts = tokenizeTerminalCommand(value);
+      const activeToken = parts[parts.length - 1] || '';
+      const candidates = [...terminalCommands, ...terminalFileNames, 'about', 'resume', 'portfolio', 'projects', 'contact', 'github', 'linkedin', 'x'];
+      const matches = candidates.filter((candidate) => candidate.startsWith(activeToken.toLowerCase()));
+
+      if (matches.length === 1) {
+        heroTerminalInput.value = `${value.slice(0, value.length - activeToken.length)}${matches[0]}`;
+      } else if (matches.length > 1) {
+        renderTerminalResult(value || 'tab', matches);
+      }
+    }
+
+    heroTerminal.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!heroTerminalInput) return;
+
+      const rawCommand = heroTerminalInput.value.trim();
+
+      if (!rawCommand) {
+        renderTerminalLines(defaultTerminalLines);
+        return;
+      }
+
+      const promptPath = currentTerminalPath;
+      terminalHistory.push(rawCommand);
+      terminalHistoryIndex = terminalHistory.length;
+
+      if (rawCommand.toLowerCase() === 'clear') {
+        renderTerminalLines(defaultTerminalLines);
+        heroTerminalInput.value = '';
+        return;
+      }
+
+      const result = runTerminalCommand(rawCommand);
+      renderTerminalResult(rawCommand, result, promptPath);
+
+      heroTerminalInput.value = '';
+    });
+
+    heroTerminalInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        terminalHistoryIndex = Math.max(terminalHistoryIndex - 1, 0);
+        heroTerminalInput.value = terminalHistory[terminalHistoryIndex] || '';
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        terminalHistoryIndex = Math.min(terminalHistoryIndex + 1, terminalHistory.length);
+        heroTerminalInput.value = terminalHistory[terminalHistoryIndex] || '';
+      }
+
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        autocompleteTerminalCommand();
+      }
     });
   }
 
@@ -667,14 +949,14 @@
   });
 
   /**
-   * Initiate portfolio lightbox 
+   * Initiate portfolio lightbox
    */
   const portfolioLightbox = GLightbox({
     selector: '.portfolio-lightbox'
   });
 
   /**
-   * Initiate portfolio details lightbox 
+   * Initiate portfolio details lightbox
    */
   const portfolioDetailsLightbox = GLightbox({
     selector: '.portfolio-details-lightbox',
