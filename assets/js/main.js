@@ -165,45 +165,11 @@
   if (heroTerminal) {
     const heroTerminalInput = select('#hero-terminal-input');
     const heroTerminalOutput = select('#hero-terminal-output');
+    const heroTerminalPrompt = select('.hero-console-prompt');
     const terminalFileNames = ['about', 'skills', 'work', 'research', 'resume', 'projects', 'contact'];
-    const terminalFiles = {
-      about: [
-        'Azmain Kabir',
-        'Software engineer and researcher focused on developer tools, automation, observability, and AI-assisted software engineering.'
-      ],
-      skills: [
-        'Python, FastAPI, React, TypeScript, Java, SQL',
-        'Grafana plugin development, CI/CD analytics, Playwright automation',
-        'GitHub APIs, data pipelines, RAG systems, LLM-assisted analysis'
-      ],
-      work: [
-        'Queen\'s University: research infrastructure for software repositories, pull requests, CI/CD, tests, and developer workflows.',
-        'Huawei Canada: Grafana visualization plugins, performance dashboards, log pipelines, RAG backend, and automation tooling.',
-        'MASTER WiZR: QA strategy, regression workflows, test plans, and release reliability.'
-      ],
-      research: [
-        'Software analytics and mining software repositories',
-        'LLM-assisted software development practices',
-        'Retrieval-augmented prompting and reproducible research artifacts',
-        'Publications: ZS4C, P4OMP, and medical imaging classification work'
-      ],
-      resume: [
-        'Work: Queen\'s University, Huawei Canada, University of Manitoba, MASTER WiZR',
-        'Education: M.Sc. Computer Science, University of Manitoba',
-        'Use cd resume to jump to the full resume section.'
-      ],
-      projects: [
-        'Portfolio projects include web interfaces, UI/UX work, app prototypes, and observability tooling.',
-        'Use cd portfolio to jump to the project section.'
-      ],
-      contact: [
-        'Use cd contact to jump to the contact form.',
-        'External profiles: LinkedIn, GitHub, and X are linked on this page.'
-      ]
-    };
     const defaultTerminalLines = [
-      'Azmain portfolio shell',
-      'type help, ls, cat skills, grep python work, or cd contact'
+      'Azmain website shell',
+      'type help, ls, cat skills, grep grafana work, or cd contact'
     ];
     const terminalCommands = ['cat', 'cd', 'clear', 'date', 'echo', 'find', 'grep', 'help', 'history', 'ls', 'man', 'open', 'pwd', 'sudo', 'tree', 'uname', 'whoami'];
     const terminalHistory = [];
@@ -211,6 +177,141 @@
     let currentTerminalPath = '~';
 
     const tokenizeTerminalCommand = (value) => value.match(/"[^"]*"|'[^']*'|\S+/g)?.map((part) => part.replace(/^["']|["']$/g, '')) || [];
+
+    const cleanTerminalText = (value) => value.replace(/\s+/g, ' ').trim();
+
+    const getTerminalText = (selector, fallback = '', root = document) => {
+      const element = root.querySelector(selector);
+      return element ? cleanTerminalText(element.textContent) : fallback;
+    }
+
+    const getTerminalTexts = (selector, root = document) => [...root.querySelectorAll(selector)]
+      .map((element) => cleanTerminalText(element.textContent))
+      .filter(Boolean);
+
+    const getSkillLabel = (skillElement) => {
+      const valueElement = skillElement.querySelector('.val');
+      const value = valueElement ? cleanTerminalText(valueElement.textContent) : '';
+      const name = cleanTerminalText(skillElement.textContent.replace(value, ''));
+      return value ? `${name}: ${value}` : name;
+    }
+
+    const getResumeGroups = () => {
+      const groups = {};
+
+      const addResumeItem = (groupName, element) => {
+        const name = getTerminalText('.name', '', element) || getTerminalText('.name-place', '', element);
+        const place = getTerminalText('.place', '', element);
+        const dates = getTerminalTexts('.date', element);
+        const titles = getTerminalTexts('.title', element);
+        const bullets = getTerminalTexts('li', element).slice(0, 2);
+        const heading = [
+          name,
+          place ? `(${place})` : '',
+          titles.length ? `- ${titles.join(' / ')}` : '',
+          dates.length ? `[${dates.join(' / ')}]` : ''
+        ].filter(Boolean).join(' ');
+
+        groups[groupName] = groups[groupName] || [];
+        groups[groupName].push([heading, ...bullets.map((bullet) => `  - ${bullet}`)].filter(Boolean).join('\n'));
+      }
+
+      const sectionGroups = select('.resume-section-group', true);
+
+      if (sectionGroups.length) {
+        sectionGroups.forEach((group) => {
+          const title = getTerminalText('.resume-title', '', group);
+          if (!title) return;
+
+          select('.resume-item', true).filter((item) => group.contains(item)).forEach((item) => {
+            addResumeItem(title, item);
+          });
+        });
+
+        return groups;
+      }
+
+      let currentGroup = '';
+
+      select('.resume-list > *', true).forEach((element) => {
+        if (element.classList.contains('resume-title')) {
+          currentGroup = cleanTerminalText(element.textContent);
+          groups[currentGroup] = groups[currentGroup] || [];
+          return;
+        }
+
+        if (currentGroup && element.classList.contains('resume-item')) {
+          addResumeItem(currentGroup, element);
+        }
+      });
+
+      return groups;
+    }
+
+    const getContactLines = () => {
+      const contactItems = select('#contact .info > div', true).map((item) => {
+        const label = getTerminalText('h4', '', item).replace(/:$/, '');
+        const value = getTerminalText('p', '', item);
+        return label && value ? `${label}: ${value}` : value;
+      }).filter(Boolean);
+      const socials = select('#hero .social-links a', true).map((link) => link.getAttribute('aria-label')).filter(Boolean);
+
+      return [
+        ...contactItems,
+        socials.length ? `Profiles: ${socials.join(', ')}` : '',
+        'Use cd contact to jump to the contact form.'
+      ].filter(Boolean);
+    }
+
+    const getPortfolioLines = () => {
+      const projects = select('#portfolio .portfolio-item', true).map((item) => {
+        const title = getTerminalText('h4', '', item);
+        const category = getTerminalText('.portfolio-info p', '', item);
+        const summary = getTerminalText('.portfolio-summary', '', item);
+        return [title, category ? `(${category})` : '', summary ? `- ${summary}` : ''].filter(Boolean).join(' ');
+      }).filter(Boolean);
+
+      return projects.length ? [...projects, 'Use cd portfolio to jump to the project section.'] : ['No portfolio items found.'];
+    }
+
+    const terminalFileReaders = {
+      about: () => [
+        getTerminalText('#hero h1', 'Azmain Kabir'),
+        getTerminalText('#hero .hero-summary'),
+        getTerminalText('#about .section-title p'),
+        getTerminalText('#about .content h3')
+      ].filter(Boolean),
+      skills: () => [
+        `Focus: ${getTerminalTexts('#hero .tech-chip').join(', ')}`,
+        ...select('#skills .skill', true).map(getSkillLabel)
+      ].filter((line) => line !== 'Focus: '),
+      work: () => getResumeGroups()['Work Experience'] || ['No work experience entries found.'],
+      research: () => [
+        ...(getResumeGroups()['Research Papers'] || []),
+        ...(getResumeGroups()['Research Talks'] || [])
+      ],
+      resume: () => {
+        const groups = getResumeGroups();
+        const lines = Object.entries(groups).map(([title, items]) => `${title}: ${items.length} ${items.length === 1 ? 'entry' : 'entries'}`);
+        return [...lines, 'Use cd resume to jump to the full resume section.'];
+      },
+      projects: getPortfolioLines,
+      contact: getContactLines
+    };
+
+    const readTerminalFile = (fileName) => {
+      const reader = terminalFileReaders[fileName];
+      if (!reader) return null;
+      const lines = reader().filter(Boolean);
+      return lines.length ? lines : [`${fileName}: no page content found`];
+    }
+
+    const formatTerminalPrompt = (promptPath = currentTerminalPath) => `azmain@website:${promptPath}$`;
+
+    const syncTerminalPrompt = () => {
+      if (!heroTerminalPrompt) return;
+      heroTerminalPrompt.textContent = formatTerminalPrompt();
+    }
 
     const moveTerminalCaretToEnd = () => {
       if (!heroTerminalInput) return;
@@ -230,7 +331,7 @@
     }
 
     const renderTerminalResult = (rawCommand, lines, promptPath = currentTerminalPath) => {
-      renderTerminalLines([`${promptPath} $ ${rawCommand}`, ...lines]);
+      renderTerminalLines([`${formatTerminalPrompt(promptPath)} ${rawCommand}`, ...lines]);
     }
 
     const scrollTerminalTo = (sectionId) => {
@@ -242,7 +343,7 @@
       'ls, tree, pwd, whoami, uname, date, history, clear',
       'cat <file>, grep <term> <file>, echo <text>',
       'Navigation:',
-      'cd about | resume | portfolio | contact',
+      'cd about | skills | work | research | resume | portfolio | projects | contact | ..',
       'open github | linkedin | x | portfolio | resume | contact',
       `Files: ${terminalFileNames.join(', ')}`
     ];
@@ -255,7 +356,7 @@
       if (!command) return defaultTerminalLines;
 
       if (terminalFileNames.includes(command)) {
-        return terminalFiles[command];
+        return readTerminalFile(command);
       }
 
       switch (command) {
@@ -267,29 +368,36 @@
           return defaultTerminalLines;
 
         case 'ls':
+          if (currentTerminalPath === '~/resume') {
+            return Object.keys(getResumeGroups());
+          }
+
+          if (currentTerminalPath === '~/projects' || currentTerminalPath === '~/portfolio') {
+            return select('#portfolio .portfolio-info h4', true).map((item) => cleanTerminalText(item.textContent));
+          }
+
+          if (currentTerminalPath === '~/contact') {
+            return getContactLines().map((line) => line.split(':')[0]);
+          }
+
+          if (currentTerminalPath === '~/skills') {
+            return getTerminalTexts('#hero .tech-chip');
+          }
+
           return terminalFileNames;
 
         case 'tree':
         case 'find':
-          return [
-            '.',
-            './about',
-            './skills',
-            './work',
-            './research',
-            './resume',
-            './projects',
-            './contact'
-          ];
+          return ['.', ...terminalFileNames.map((fileName) => `./${fileName}`)];
 
         case 'pwd':
-          return [`/home/azmain/portfolio${currentTerminalPath.replace('~', '')}`];
+          return [`/home/azmain/website${currentTerminalPath.replace('~', '')}`];
 
         case 'whoami':
           return ['azmain-kabir'];
 
         case 'uname':
-          return ['Azmain portfolio-shell'];
+          return ['Azmain website-shell'];
 
         case 'date':
           return [new Date().toLocaleString()];
@@ -302,19 +410,19 @@
 
         case 'cat': {
           const file = (args[0] || '').toLowerCase();
-          return terminalFiles[file] || [`cat: ${args[0] || ''}: no such portfolio file`, `try: cat ${terminalFileNames.join(' | cat ')}`];
+          return readTerminalFile(file) || [`cat: ${args[0] || ''}: no such portfolio file`, `try: cat ${terminalFileNames.join(' | cat ')}`];
         }
 
         case 'grep': {
           const term = (args[0] || '').toLowerCase();
           const file = (args[1] || '').toLowerCase();
-          const filesToSearch = terminalFiles[file] ? [file] : terminalFileNames;
+          const filesToSearch = readTerminalFile(file) ? [file] : terminalFileNames;
           const matches = [];
 
           if (!term) return ['usage: grep <term> [file]'];
 
           filesToSearch.forEach((fileName) => {
-            terminalFiles[fileName].forEach((line) => {
+            readTerminalFile(fileName).forEach((line) => {
               if (line.toLowerCase().includes(term)) {
                 matches.push(`${fileName}: ${line}`);
               }
@@ -329,7 +437,11 @@
           const routes = {
             '~': '#hero',
             home: '#hero',
+            '..': '#hero',
             about: '#about',
+            skills: '#skills',
+            work: '#resume',
+            research: '#resume',
             resume: '#resume',
             portfolio: '#portfolio',
             projects: '#portfolio',
@@ -340,17 +452,23 @@
             return [`cd: ${args[0] || ''}: no such section`, 'try: cd about, cd resume, cd portfolio, or cd contact'];
           }
 
-          currentTerminalPath = target === '~' || target === 'home' ? '~' : `~/${target}`;
+          currentTerminalPath = target === '~' || target === 'home' || target === '..' ? '~' : `~/${target}`;
+          syncTerminalPrompt();
           scrollTerminalTo(routes[target]);
-          return [`navigating to ${target === '~' ? 'home' : target}`];
+          return [`navigating to ${target === '~' || target === '..' ? 'home' : target}`];
         }
 
         case 'open': {
           const target = (args[0] || '').toLowerCase();
+          const socialLinks = {
+            github: select('#hero .social-links .github')?.href,
+            linkedin: select('#hero .social-links .linkedin')?.href,
+            x: select('#hero .social-links .twitter')?.href
+          };
           const links = {
-            github: 'https://github.com/azmainkabir',
-            linkedin: 'https://www.linkedin.com/in/azmain-kabir',
-            x: 'https://x.com/Swaran792'
+            github: socialLinks.github,
+            linkedin: socialLinks.linkedin,
+            x: socialLinks.x
           };
           const routes = {
             portfolio: '#portfolio',
@@ -447,6 +565,8 @@
         autocompleteTerminalCommand();
       }
     });
+
+    syncTerminalPrompt();
   }
 
   /**

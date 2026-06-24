@@ -866,6 +866,7 @@ h6 {
   font-weight: 700;
   line-height: 1.2;
   pointer-events: none;
+  white-space: nowrap;
 }
 
 #hero .hero-console-input {
@@ -1052,6 +1053,12 @@ h6 {
   }
   #hero .hero-console {
     font-size: 11px;
+  }
+
+  #hero .hero-console-command-line {
+    column-gap: 5px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 
